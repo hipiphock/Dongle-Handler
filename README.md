@@ -2,5 +2,5 @@
 handles ble devices
 
 # Todo:
-1. BLE 통신에서 command를 보내고, 이를 받는 것
-2. json 형식?
+Pybluez와 같은 library를 사용해서 command set을 쓴다.
+이때, command set은 json과 같은 file을 이용하고, 

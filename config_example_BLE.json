@@ -1,0 +1,13 @@
+{
+    "Device":"Ultra Thin Wafer",
+    "uuid": "qwer-asdf-zxcv",
+    "connection":"BLE",
+    "service":{
+        "uuid": "4cc49cc9-bde6-4b43-8c51-93785dd7873e",
+        "characteristics":{
+            "uuid":"qwer-asdf-zxcv",
+            "type":"write",
+            "value":"0x0001"
+        }
+    }
+}

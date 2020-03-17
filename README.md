@@ -43,8 +43,10 @@ json 안에 들어가는 config.json의 경우 다음과 같은 형식을 가진
     }
 }
 ```
-통신을 하려는 device의 정보(이름과 uuid)와 통신하는 방식을 정의한 후, 원하는 service와 characteristic에 대해서 상세하게 서술한다.
+
+통신을 하려는 device의 정보(이름과 uuid)와 통신하는 방식을 정의한 후, 원하는 service와 해당 service의 characteristic 중 하나에 대해서 대해서 상세하게 서술한다.
+
+해당 characteristic의 type이 read인지, write인지, notify인지에 따라서 value를 보낼 것인지 받을 것인지가 달라진다.
 
 # Todo:
 Pybluez와 같은 library를 사용해서 command set을 쓴다.
-이때, command set은 json과 같은 file을 이용하고, 

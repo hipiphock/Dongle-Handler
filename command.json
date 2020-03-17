@@ -1,14 +1,5 @@
 {
     "command":[
-        "config1.json", 
-        "config2.json", 
-        "config3.json", 
-        "config4.json", 
-        "config5.json", 
-        "config6.json", 
-        "config7.json", 
-        "config8.json", 
-        "config9.json", 
-        "config10.json"
+        "config1.json"
     ]
 }

@@ -1,5 +1,5 @@
 {
-    "command":[
-        "config1.json"
-    ]
+    "command":"config1.json",
+    "iteration":3,
+    "range":[0, 3]
 }

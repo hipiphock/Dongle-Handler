@@ -5,32 +5,33 @@ import json
 def load_command():
     with open('command.json') as commandfile:
         content = json.load(commandfile)
-        commandlist = content['command']
-        for i in commandlist:
-            do_individual_job(i)
+        command = content['command']
+        iteration = content['iteration']
+        value_range = content['range']
+        for i in range(iteration):
+            do_individual_job(i, value_range)
 
-def do_individual_job(config):
+def do_individual_job(config, value_range):
     with open(config) as configfile:
         data = json.load(configfile)
-        # print(data)
         device_name = data['Device']
-        # print(device_name)
+        print("Device name: {}".format(device_name))
         device_uuid = data['uuid']
-        # print(device_uuid)
+        print("Device uuid: {}".format(device_uuid))
         connection_type = data['connection']
-        # print(connection_type)
+        print("Connection type: {}".format(connection_type))
         service = data['service']
-        # print(service)
         service_uuid = service['uuid']
-        # print(service_uuid)
+        print("Service uuid: {}".format(service_uuid))
         service_char = service['characteristics']
-        # print(service_char)
         char_uuid = service_char['uuid']
-        # print(char_uuid)
+        print("Characteristic uuid: {}".format(char_uuid))
         char_type = service_char['type']
-        # print(char_type)
-        char_value = service_char['value']
-        # print(char_value)
+        print("Characteristic type: {}".format(char_type))
+        print("Value: {}".format(get_value(value_range[0], value_range[1])))
+
+def get_value(start, end):
+    return random.randrange(start, end)
 
 load_command()
 # service = DiscoveryService()

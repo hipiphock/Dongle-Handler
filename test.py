@@ -1,5 +1,6 @@
 # bluetooth low energy scan
 import json
+import random
 # from bluetooth.ble import DiscoveryService
 
 def load_command():
@@ -9,7 +10,7 @@ def load_command():
         iteration = content['iteration']
         value_range = content['range']
         for i in range(iteration):
-            do_individual_job(i, value_range)
+            do_individual_job(command, value_range)
 
 def do_individual_job(config, value_range):
     with open(config) as configfile:
@@ -30,7 +31,9 @@ def do_individual_job(config, value_range):
         print("Characteristic type: {}".format(char_type))
         print("Value: {}".format(get_value(value_range[0], value_range[1])))
 
-def get_value(start, end):
+def get_value(start_, end_):
+    start = int(start_, 0)
+    end = int(end_, 0)
     return random.randrange(start, end)
 
 load_command()

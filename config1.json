@@ -1,12 +1,12 @@
 {
-    "Device":"Ultra Thin Wafer",
-    "uuid": "qwer-asdf-zxcv",
-    "connection":"BLE",
-    "service":{
-        "uuid": "4cc49cc9-bde6-4b43-8c51-93785dd7873e",
-        "characteristics":{
-            "uuid":"7294a72e-239d-4e38-b1eb-29f5c75e319a",
-            "type":"write"
-        }
-    }
-}    
+    "Device":"Ultra Thin Wafer",
+    "uuid": "qwer-asdf-zxvc",
+    "connection":"BLE",
+    "service":{
+        "uuid":"4cc49cc9-bde6-4b43-8c51-93785dd7873e",
+        "characteristics":{
+            "uuid":"7294a72e-239d-4e38-b1eb-29f5c75e319a",
+            "type":"write"
+        }
+    }
+}

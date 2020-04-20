@@ -48,5 +48,17 @@ json 안에 들어가는 config.json의 경우 다음과 같은 형식을 가진
 
 해당 characteristic의 type이 read인지, write인지, notify인지에 따라서 value를 보낼 것인지 받을 것인지가 달라진다.
 
+# Hardware Requirements
+This program is made for nRF52840 dongle from Nordic Semiconductor.
+## On connection,
+ * 115200 bit/s,
+ * 8-bit-long word,
+ * no parity,
+ * 1-bit stop.
+would be required between PC and dongle.
+
 # Todo
-BLE와 Zigbee의 config를 update
+ * Update BLE & Zigbee configuration files.
+ * Make an interface between PC and dongle.
+ * Unify BLE CLI and Zigbee CLI.
+ * Implement the return fetching part.

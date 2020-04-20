@@ -1,6 +1,6 @@
 {
     "Device":       "Ultra Thin Wafer",
-    "uuid":         "qwer-asdf-zxvc",
+    "address":      "0xe48f",
     "description":  "Turn on the device",
     "connection":   "Zigbee",
     "cluster":      "0x0006",

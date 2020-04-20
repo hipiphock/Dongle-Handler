@@ -1,5 +1,4 @@
 {
-    "command":"config1.json",
-    "iteration":3,
-    "range":["0x0001", "0x00FF"]
+    "command":"./config/Zigbee/config_zigbee_onoff_off",
+    "iteration":3
 }

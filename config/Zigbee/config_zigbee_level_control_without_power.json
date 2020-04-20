@@ -3,6 +3,7 @@
     "uuid":         "qwer-asdf-zxvc",
     "description":  "Turn on the device",
     "connection":   "Zigbee",
-    "cluster":      "0x0006",
-    "command":      "0x01"
+    "cluster":      "0x0008",
+    "command":      "0x00",
+    "payload":      ["(level value)", "(transition time)"]
 }

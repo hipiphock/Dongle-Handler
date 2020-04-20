@@ -4,5 +4,5 @@
     "description":  "Turn on the device",
     "connection":   "Zigbee",
     "cluster":      "0x0006",
-    "command":      "0x01"
+    "command":      "0x00"
 }

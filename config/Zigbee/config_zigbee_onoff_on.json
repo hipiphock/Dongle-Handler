@@ -1,0 +1,10 @@
+{
+    "Device":       "Ultra Thin Wafer",
+    "uuid":         "qwer-asdf-zxvc",
+    "description":  "Turn on the device",
+    "connection":   "Zigbee",
+    "cluster":{
+        "id":       "0x0006",
+        "value":    "0x00"
+    }
+}

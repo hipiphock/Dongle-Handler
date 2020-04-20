@@ -1,5 +1,5 @@
-# BLE handler
-IoT 장치에게 BLE 통신을 할 때, 정해진 command를 내리는 프로그램
+# Dongle handler
+**nRF52840 dongle handler with BLE, Zigbee command functions**
 
 주어진 json 파일을 이용하여서 명령을 내린다.
 
@@ -48,5 +48,5 @@ json 안에 들어가는 config.json의 경우 다음과 같은 형식을 가진
 
 해당 characteristic의 type이 read인지, write인지, notify인지에 따라서 value를 보낼 것인지 받을 것인지가 달라진다.
 
-# Todo:
-Pybluez와 같은 library를 사용해서 command set을 쓴다.
+# Todo
+BLE와 Zigbee의 config를 update

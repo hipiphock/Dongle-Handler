@@ -2,7 +2,7 @@ import enum
 
 # maps cluster value into 
 # which function does it is concerned with
-class Service(enum.Enum):
+class Service:
     OnOff = 0x0006
     Level = 0x0008
     Color = 0x0300

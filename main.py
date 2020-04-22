@@ -13,7 +13,7 @@ def main():
 
     # first, try to connect with dongle
     # try:
-    #     cli_instance = ZbCliDevice('', '','COM13')    # COM port can be changed in accordance with your environment
+    cli_instance = ZbCliDevice('', '','COM13')    # COM port can be changed in accordance with your environment
     #     cli_instance.bdb.channel = 24
     #     cli_instance.bdb.role = 'zr'
     # except serial.serialutil.SerialException:
@@ -26,9 +26,9 @@ def main():
     # print(cli_instance.wait_until_connected())
 
     # attribute = Attribute(ON_OFF_CLUSTER, 0, TYPES.BOOL, ON_OFF_OFF_CMD)
-    for i in range(1000):
-        cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
-        cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_ON_CMD)
+    # cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
+    # cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_ON_CMD)
+    cli_instance.zcl.raw(eui64, 8, ON_OFF_CLUSTER, '0x00')
 
 
 if __name__ == "__main__":

@@ -1,4 +1,21 @@
 {
-    "command":"./config/Zigbee/config_zigbee_onoff_off",
-    "iteration":1
+    "DeviceName":"Ultra Thin Wafer",
+    "DeviceID":"asdf-qwer-zxcv",
+    "command":[
+    {
+        "command":"./config/Zigbee/config_zigbee_onoff_off",
+        "iteration":1
+    },
+    {
+        "command":"./config/Zigbee/config_zigbee_onoff_on",
+        "iteration":1
+    },
+    {
+        "command":
+        ["./config/Zigbee/config_zigbee_onoff_on",
+         "./config/Zigbee/config_zigbee_onoff_off"
+        ],
+        "iteration":5
+    }
+    ]
 }

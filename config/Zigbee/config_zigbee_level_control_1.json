@@ -1,0 +1,14 @@
+{
+    "connection": "Zigbee",
+    "command": "LVL_CTRL_MV_TO_LVL_CMD",
+    "payloads": [
+        {
+            "value": "0x05",
+            "type": "TYPES.UINT8"
+        },
+        {
+            "value": "0x00",
+            "type": "TYPES.UINT16"
+        }
+    ]
+}

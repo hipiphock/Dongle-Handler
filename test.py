@@ -6,84 +6,86 @@ import serial
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.cmd_wrappers.zigbee.constants import *
 
-# CURRENT WAFER'S ENDPOINT IS 8
-    
-class Attr:
-    def __init__(self, _eui64, _cluster, _attr_id, _type, _value, _ep, _profile):
+zigbee_is_started = False
+device_addr = 0xe48f
+ep = 8 
+device_uuid = "asdf-qwer-zxcv"
+cli_instance = None
+
+class ZigbeeAttr:
+    def __init__(self, _eui64, _ep, _cluster, _cmd_id, _payload):
         self.eui64 = _eui64
         self.ep = _ep
         self.cluster = _cluster
-        self.id = _attr_id
-        self.type = _type
-        self.value = _value
-        self.profile = _profile
+        self.cmd_id = _cmd_id
+        self.payload = _payload
+        # self.id = _attr_id
+        # self.type = _data_type
+        # self.value = _value
         
-def make_attr(command_str, address, payloads):
-    command_map = { "ON_OFF_OFF_CMD":ON_OFF_OFF_CMD, 
-                    "ON_OFF_ON_CMD":ON_OFF_ON_CMD,
-                    "LVL_CTRL_MV_TO_LVL_CMD":LVL_CTRL_MV_TO_LVL_CMD,
-                    "COLOR_CTRL_MV_TO_HUE_CMD":COLOR_CTRL_MV_TO_HUE_CMD,
-                    "COLOR_CTRL_MV_TO_SAT_CMD":COLOR_CTRL_MV_TO_SAT_CMD,
-                    "COLOR_CTRL_MV_TO_HUE_SAT_CMD":COLOR_CTRL_MV_TO_HUE_SAT_CMD
-    }
+def make_attr(command_str, address, ep, payloads):
+    command_map = {"ON_OFF_OFF_CMD":ON_OFF_OFF_CMD, 
+    "ON_OFF_ON_CMD":ON_OFF_ON_CMD,
+    "LVL_CTRL_MV_TO_LVL_CMD":LVL_CTRL_MV_TO_LVL_CMD,
+    "COLOR_CTRL_MV_TO_HUE_CMD":COLOR_CTRL_MV_TO_HUE_CMD,
+    "COLOR_CTRL_MV_TO_SAT_CMD":COLOR_CTRL_MV_TO_SAT_CMD,
+    "COLOR_CTRL_MV_TO_HUE_SAT_CMD":COLOR_CTRL_MV_TO_HUE_SAT_CMD}
     command_int = command_map[command_str]
     cluster = 0
-    attr_id = 0
-    data_type = TYPES.BOOL
+    # attr_id = 0
     if command_str.find("ON_OFF") != -1:
         cluster = ON_OFF_CLUSTER
-        attr_id = ON_OFF_ONOFF_ATTR
+        # attr_id = ON_OFF_ONOFF_ATTR
     elif command_str.find("LVL_CTRL") != -1:
         cluster = LVL_CTRL_CLUSTER
-        attr_id = LVL_CTRL_CURR_LVL_ATTR
-        data_type = TYPES.UINT16
+        # attr_id = LVL_CTRL_CURR_LVL_ATTR
     elif command_str.find("COLOR_CTRL") != -1:
         cluster = COLOR_CTRL_CLUSTER
-        if command_str.find("TO_HUE_CMD") != -1:
-            attr_id = COLOR_CTRL_CURR_HUE_ATTR
-        elif command_str.find("TO_SAT_CMD") != -1:
-            attr_id = COLOR_CTRL_CURR_SAT_ATTR
-        data_type = TYPES.UINT16
-    if payloads == []:
-        return Attr(address, cluster, attr_id, data_type, command_int, 8, 0x0104)
-    else:
-        return Attr(address, cluster, attr_id, data_type, payloads, 8, 0x0104)
-        
+        # if command_str.find("TO_HUE_CMD") != -1:
+        #     attr_id = COLOR_CTRL_CURR_HUE_ATTR
+        # elif command_str.find("TO_SAT_CMD") != -1:
+        #     attr_id = COLOR_CTRL_CURR_SAT_ATTR
+    addr = int(device_addr, 16)
+    return ZigbeeAttr(addr, ep, cluster, command_int, payloads)
 
 def load_command():
     with open('command.json') as commandfile:
         content = json.load(commandfile)
-        command = content['command']
-        iteration = content['iteration']
-        for i in range(iteration):
-            do_individual_job(command)
+        device_name = content['Device']
+        print("Device name: {}".format(device_name))
+        device_uuid = content['uuid']
+        print("Device uuid: {}".format(device_uuid))
+        global device_addr
+        device_addr = content['address']
+        print("Device address: {}".format(device_addr))
+        global ep
+        ep = content['ep']
+        print("ep: {}".format(ep))
+        command_list = content['command_list']
+        for command_set in command_list:
+            do_each_command(command_set)
+
+def do_each_command(command):
+    config_file = command['command'] + ".json"
+    iteration = command['iteration']
+    for i in range(iteration):
+        do_individual_job(config_file)  
 
 def do_individual_job(config):
-    with open(config+".json") as configfile:
+    with open(config) as configfile:
         data = json.load(configfile)
-        device_name = data['Device']
-        print("Device name: {}".format(device_name))
         connection_type = data['connection']
-        print("Connection type: {}".format(connection_type))
+        print("\nConnection type: {}".format(connection_type))
         if connection_type == "Zigbee":
-            device_addr = data['address']
-            print("Device address: {}".format(device_addr))
-            cluster = data['cluster']
-            print("cluster: {}".format(cluster))
             command = data['command']
             print("Command: {}".format(command))
-            description = data['description']
-            print("description: {}".format(description))
             payloads = []
             if config.split("/")[-1].find("onoff") == -1:
                 payloads = data['payloads']
                 print("Payloads: {}".format(payloads))
-            attribute = make_attr(command, device_addr, payloads)
+            attribute = make_attr(command, device_addr, ep, format_payload(payloads))
             zigbee_write(attribute)
-            
         else:
-            device_uuid = data['uuid']
-            print("Device uuid: {}".format(device_uuid))
             service = data['service']
             service_uuid = service['uuid']
             print("Service uuid: {}".format(service_uuid))
@@ -93,28 +95,54 @@ def do_individual_job(config):
             char_type = service_char['type']
             print("Characteristic type: {}".format(char_type))
 
+def format_payload(payload):
+    types_map = {"TYPES.BOOL": TYPES.BOOL,
+    "TYPES.UINT8": TYPES.UINT8,
+    "TYPES.UINT16": TYPES.UINT16, 
+    "TYPES.UINT32": TYPES.UINT32,
+    "TYPES.UINT64": TYPES.UINT64,
+    "TYPES.SINT8": TYPES.SINT8,
+    "TYPES.SINT16": TYPES.SINT16,
+    "TYPES.SINT64": TYPES.SINT64, 
+    "TYPES.ENUM8": TYPES.ENUM8,
+    "TYPES.MAP8": TYPES.MAP8, 
+    "TYPES.EUI64": TYPES.EUI64,
+    "TYPES.STRING": TYPES.STRING }
+    result = []
+    for item in payload:
+        value_type = types_map[item['type']]
+        if value_type is not TYPES.STRING:
+            value = int(item['value'], 16)
+        else:
+            value = item['value']
+        result.append((value, value_type))
+    return result
+
 def zigbee_write(attribute):
-    try:
-        cli_instance = ZbCliDevice('','','COM13')
-        cli_instance.bdb.channel = [24]
-        cli_instance.bdb.role = 'zr'
+    global zigbee_is_started
+    if zigbee_is_started == False:
+        try:
+            global cli_instance
+            cli_instance = ZbCliDevice('','','COM5')
+            cli_instance.bdb.channel = [15]
+            cli_instance.bdb.role = 'zr'
+        except serial.serialutil.SerialException:
+            cli_instance.close_cli()
+            return None
         cli_instance.bdb.start()
-    except serial.serialutil.SerialException:
-        print("FAILED")
-        cli_instance.close_cli()
-        return None
-    # cli_instance.bdb.start()
-    addr = int(attribute.eui64, 16)
-    # cli_instance.zcl.readattr(eui64=addr, attr=attribute, ep=attribute.ep, profile=attribute.profile)
-    cli_instance.zcl.writeattr(eui64=addr, attr= attribute, ep=attribute.ep, profile=attribute.profile)
-    # if attribute.payload == []:
-    #     cli_instance.zcl.generic(eui64= addr, ep = attribute.ep, profile=attribute.profile, cluster=attribute.cluster, cmd_id=attribute.cmd_id)
-    # else:
-    #     cli_instance.zcl.generic(eui64= addr, ep = attribute.ep, profile=attribute.profile, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
+        zigbee_is_started = True
+
+    if attribute.payload == []:
+        cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id)
+        # x = cli_instance.zcl.raw(eui64= addr, ep = attribute.ep, cluster = attribute.cluster, payload_hex=attribute.payload)
+        # print(x)
+    else:
+        cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
         
         
 
 load_command()
+
 # service = DiscoveryService()
 # devices = service.discover(2)
 

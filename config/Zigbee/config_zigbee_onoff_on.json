@@ -1,8 +1,4 @@
 {
-    "Device":       "Ultra Thin Wafer",
-    "address":      "0x73B4",
-    "description":  "Turn on the device",
     "connection":   "Zigbee",
-    "cluster":      "0x0006",
-    "command":      "0x01"
+    "command":      "ON_OFF_ON_CMD"
 }

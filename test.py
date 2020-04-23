@@ -1,17 +1,105 @@
-# bluetooth low energy scan
 import json
 import random
-# from bluetooth.ble import DiscoveryService
 import serial
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.cmd_wrappers.zigbee.constants import *
 
-zigbee_is_started = False
+ZIGBEE_STARTED = False
 device_addr = 0xe48f
 ep = 8 
 device_uuid = "asdf-qwer-zxcv"
 cli_instance = None
 
+# finds the port that dongle is inserted
+def find_dongle_port():
+    ports = list(serial.tools.list_ports.comports())
+    for p in ports:
+        # find the appropriate port based on the name of the dongle
+        pass
+
+# representing command.json file,
+# CommandSet defines:
+# - Device's information
+# - Sequences of commands and its number of iterations
+class CommandSet:
+    def __init__(self, name, uuid, addr, ep, cmdlist):
+        self.name = name
+        self.uuid = uuid
+        self.addr = addr
+        self.ep = ep
+        self.cmdlist = cmdlist
+    # in this program, instance of CommandSet should be generated via
+    # this classmethod.
+    @classmethod
+    def make_instance(cls, cmdfile):
+        with open(cmdfile) as commandfile:
+            content = json.load(commandfile)
+            name    = content['Device']
+            uuid    = content['uuid']
+            addr    = content['address']
+            ep      = content['ep']
+            cmdlist = content['command_list']
+        return cls(name, uuid, addr, ep, cmdlist)
+
+    # inner class representing config.json files
+    # each config file's should be made by this inner class
+    class Config:
+        def __init__(self, connection, command, payloads=None):
+            self.connection = connection
+            self.command = command
+            self.payloads = payloads
+        
+        @classmethod
+        def make_instance(cls, configfile):
+            with open(configfile) as config_file:
+                print(configfile)
+                content = json.load(config_file)
+                connection  = content['connection']
+                command     = content['command']
+                payloads    = content['payloads']
+                # additional job required for payloads:
+                # - the generic function gets payloads as lists of tuples
+            return cls(connection, command, payloads)
+        
+        # does the individual process of Zigbee command
+        # or BLE service
+        def do_individual_job(self):
+            if self.connection == 'Zigbee':
+                global ZIGBEE_STARTED
+                if ZIGBEE_STARTED == False:
+                    try:
+                        global cli_instance
+                        cli_instance = ZbCliDevice('','','COM13')
+                        cli_instance.bdb.channel = [24]
+                        cli_instance.bdb.role = 'zr'
+                    except serial.serialutil.SerialException:
+                        cli_instance.close_cli()
+                        return None
+                    cli_instance.bdb.start()
+                    ZIGBEE_STARTED = True
+                attribute = make_attr(command, device_addr, ep, format_payload(payloads))
+                if attribute.payload == []:
+                    cli_instance.zcl.generic(eui64= attribute.eui64, 
+                            ep = attribute.ep, 
+                            profile=DEFAULT_ZIGBEE_PROFILE_ID, 
+                            cluster=attribute.cluster, 
+                            cmd_id=attribute.cmd_id)
+                    # x = cli_instance.zcl.raw(eui64= addr, ep = attribute.ep, cluster = attribute.cluster, payload_hex=attribute.payload)
+                    # print(x)
+                else:
+                    cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
+
+    # main procedure of command.json
+    def start_routine(self):
+        for command in self.cmdlist:
+            configfile = command['command'] + ".json"
+            iteration = command['iteration']
+            config = self.Config.make_instance(configfile)
+            for iter in range(iteration):
+                config.do_individual_job()
+    
+
+# defines Zigbee Attribute
 class ZigbeeAttr:
     def __init__(self, _eui64, _ep, _cluster, _cmd_id, _payload):
         self.eui64 = _eui64
@@ -19,9 +107,6 @@ class ZigbeeAttr:
         self.cluster = _cluster
         self.cmd_id = _cmd_id
         self.payload = _payload
-        # self.id = _attr_id
-        # self.type = _data_type
-        # self.value = _value
         
 def make_attr(command_str, address, ep, payloads):
     command_map = {"ON_OFF_OFF_CMD":ON_OFF_OFF_CMD, 
@@ -48,6 +133,7 @@ def make_attr(command_str, address, ep, payloads):
     addr = int(device_addr, 16)
     return ZigbeeAttr(addr, ep, cluster, command_int, payloads)
 
+# parses command
 def load_command():
     with open('command.json') as commandfile:
         content = json.load(commandfile)
@@ -119,18 +205,18 @@ def format_payload(payload):
     return result
 
 def zigbee_write(attribute):
-    global zigbee_is_started
-    if zigbee_is_started == False:
+    global ZIGBEE_STARTED
+    if ZIGBEE_STARTED == False:
         try:
             global cli_instance
-            cli_instance = ZbCliDevice('','','COM5')
-            cli_instance.bdb.channel = [15]
+            cli_instance = ZbCliDevice('','','COM13')
+            cli_instance.bdb.channel = [24]
             cli_instance.bdb.role = 'zr'
         except serial.serialutil.SerialException:
             cli_instance.close_cli()
             return None
         cli_instance.bdb.start()
-        zigbee_is_started = True
+        ZIGBEE_STARTED = True
 
     if attribute.payload == []:
         cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id)
@@ -138,13 +224,9 @@ def zigbee_write(attribute):
         # print(x)
     else:
         cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
-        
-        
 
-load_command()
-
-# service = DiscoveryService()
-# devices = service.discover(2)
-
-# for address, name in devices.items():
-#     print("name: {}, address: {}".format(name, address))
+if __name__ == "__main__":
+    # find_dongle_port()
+    commander = CommandSet.make_instance('command.json')
+    commander.start_routine()
+    # load_command()

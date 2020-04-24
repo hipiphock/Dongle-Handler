@@ -15,6 +15,7 @@ def find_dongle_port():
     ports = list(serial.tools.list_ports.comports())
     for p in ports:
         # find the appropriate port based on the name of the dongle
+        # TODO: Implement automated port selector
         pass
 
 # representing command.json file,
@@ -38,67 +39,79 @@ class CommandSet:
             uuid    = content['uuid']
             addr    = content['address']
             ep      = content['ep']
-            cmdlist = content['command_list']
+            cmds    = content['command_list']
+            # TODO: additioinal handling to make
+            # cmdlist as one pair of config and iteration
+            cmdlist = []
+            for cmd in cmds:
+                configfile  = cmd['command'] + ".json"
+                iteration   = cmd['iteration']
+                config = Config.make_instance(configfile)
+                cmdlist.append({'config':config, 'iteration':iteration})
         return cls(name, uuid, addr, ep, cmdlist)
-
-    # inner class representing config.json files
-    # each config file's should be made by this inner class
-    class Config:
-        def __init__(self, connection, command, payloads=None):
-            self.connection = connection
-            self.command = command
-            self.payloads = payloads
-        
-        @classmethod
-        def make_instance(cls, configfile):
-            with open(configfile) as config_file:
-                print(configfile)
-                content = json.load(config_file)
-                connection  = content['connection']
-                command     = content['command']
-                payloads    = content['payloads']
-                # additional job required for payloads:
-                # - the generic function gets payloads as lists of tuples
-            return cls(connection, command, payloads)
-        
-        # does the individual process of Zigbee command
-        # or BLE service
-        def do_individual_job(self):
-            if self.connection == 'Zigbee':
-                global ZIGBEE_STARTED
-                if ZIGBEE_STARTED == False:
-                    try:
-                        global cli_instance
-                        cli_instance = ZbCliDevice('','','COM13')
-                        cli_instance.bdb.channel = [24]
-                        cli_instance.bdb.role = 'zr'
-                    except serial.serialutil.SerialException:
-                        cli_instance.close_cli()
-                        return None
-                    cli_instance.bdb.start()
-                    ZIGBEE_STARTED = True
-                attribute = make_attr(command, device_addr, ep, format_payload(payloads))
-                if attribute.payload == []:
-                    cli_instance.zcl.generic(eui64= attribute.eui64, 
-                            ep = attribute.ep, 
-                            profile=DEFAULT_ZIGBEE_PROFILE_ID, 
-                            cluster=attribute.cluster, 
-                            cmd_id=attribute.cmd_id)
-                    # x = cli_instance.zcl.raw(eui64= addr, ep = attribute.ep, cluster = attribute.cluster, payload_hex=attribute.payload)
-                    # print(x)
-                else:
-                    cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
 
     # main procedure of command.json
     def start_routine(self):
         for command in self.cmdlist:
-            configfile = command['command'] + ".json"
-            iteration = command['iteration']
-            config = self.Config.make_instance(configfile)
-            for iter in range(iteration):
-                config.do_individual_job()
-    
+            config      = command['config']
+            iteration   = command['iteration']
+            for i in range(iteration):
+                self.do_individual_job(config)
 
+    # does the individual process of Zigbee command
+    # or BLE service
+    def do_individual_job(self, config):
+        if config.connection == 'Zigbee':
+            global ZIGBEE_STARTED
+            global cli_instance
+            if ZIGBEE_STARTED == False:
+                try:
+                    cli_instance = ZbCliDevice('','','COM13')
+                    cli_instance.bdb.channel = [24]
+                    cli_instance.bdb.role = 'zr'
+                    cli_instance.bdb.start()
+                    ZIGBEE_STARTED = True
+                except serial.serialutil.SerialException:
+                    cli_instance.close_cli()
+                    return None
+            attribute = make_attr(config.command,
+                    self.addr, 
+                    self.ep, 
+                    format_payload(config.payloads))
+            if attribute.payload == []:
+                cli_instance.zcl.generic(eui64= attribute.eui64, 
+                        ep = attribute.ep,
+                        profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                        cluster=attribute.cluster, 
+                        cmd_id=attribute.cmd_id)                
+            else:
+                cli_instance.zcl.generic(eui64= attribute.eui64, 
+                        ep = attribute.ep, 
+                        profile=DEFAULT_ZIGBEE_PROFILE_ID, 
+                        cluster=attribute.cluster, 
+                        cmd_id=attribute.cmd_id, 
+                        payload=attribute.payload)
+
+# inner class representing config.json files
+# each config file's should be made by this inner class
+class Config:
+    def __init__(self, connection, command, payloads=None):
+        self.connection = connection
+        self.command = command
+        self.payloads = payloads
+    
+    @classmethod
+    def make_instance(cls, configfile):
+        with open(configfile) as config_file:
+            print(configfile)
+            content = json.load(config_file)
+            connection  = content['connection']
+            command     = content['command']
+            payloads    = content['payloads']
+            # additional job required for payloads:
+            # - the generic function gets payloads as lists of tuples
+        return cls(connection, command, payloads)
+        
 # defines Zigbee Attribute
 class ZigbeeAttr:
     def __init__(self, _eui64, _ep, _cluster, _cmd_id, _payload):
@@ -109,12 +122,12 @@ class ZigbeeAttr:
         self.payload = _payload
         
 def make_attr(command_str, address, ep, payloads):
-    command_map = {"ON_OFF_OFF_CMD":ON_OFF_OFF_CMD, 
-    "ON_OFF_ON_CMD":ON_OFF_ON_CMD,
-    "LVL_CTRL_MV_TO_LVL_CMD":LVL_CTRL_MV_TO_LVL_CMD,
-    "COLOR_CTRL_MV_TO_HUE_CMD":COLOR_CTRL_MV_TO_HUE_CMD,
-    "COLOR_CTRL_MV_TO_SAT_CMD":COLOR_CTRL_MV_TO_SAT_CMD,
-    "COLOR_CTRL_MV_TO_HUE_SAT_CMD":COLOR_CTRL_MV_TO_HUE_SAT_CMD}
+    command_map = { "ON_OFF_OFF_CMD":ON_OFF_OFF_CMD, 
+                    "ON_OFF_ON_CMD":ON_OFF_ON_CMD,
+                    "LVL_CTRL_MV_TO_LVL_CMD":LVL_CTRL_MV_TO_LVL_CMD,
+                    "COLOR_CTRL_MV_TO_HUE_CMD":COLOR_CTRL_MV_TO_HUE_CMD,
+                    "COLOR_CTRL_MV_TO_SAT_CMD":COLOR_CTRL_MV_TO_SAT_CMD,
+                    "COLOR_CTRL_MV_TO_HUE_SAT_CMD":COLOR_CTRL_MV_TO_HUE_SAT_CMD}
     command_int = command_map[command_str]
     cluster = 0
     # attr_id = 0

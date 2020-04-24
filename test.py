@@ -78,13 +78,15 @@ class CommandSet:
                     self.ep, 
                     config.payloads)
             if attribute.payload == []:
-                cli_instance.zcl.generic(eui64= attribute.eui64, 
+                cli_instance.zcl.generic(
+                        eui64= attribute.eui64, 
                         ep = attribute.ep,
                         profile=DEFAULT_ZIGBEE_PROFILE_ID,
                         cluster=attribute.cluster, 
                         cmd_id=attribute.cmd_id)                
             else:
-                cli_instance.zcl.generic(eui64= attribute.eui64, 
+                cli_instance.zcl.generic(
+                        eui64= attribute.eui64, 
                         ep = attribute.ep, 
                         profile=DEFAULT_ZIGBEE_PROFILE_ID, 
                         cluster=attribute.cluster, 

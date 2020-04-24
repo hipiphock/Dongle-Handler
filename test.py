@@ -148,57 +148,58 @@ def make_attr(command_str, address, ep, payloads):
     return ZigbeeAttr(addr, ep, cluster, command_int, payloads)
 
 # parses command
-def load_command():
-    with open('command.json') as commandfile:
-        content = json.load(commandfile)
-        device_name = content['Device']
-        print("Device name: {}".format(device_name))
-        device_uuid = content['uuid']
-        print("Device uuid: {}".format(device_uuid))
-        global device_addr
-        device_addr = content['address']
-        print("Device address: {}".format(device_addr))
-        global ep
-        ep = content['ep']
-        print("ep: {}".format(ep))
-        command_list = content['command_list']
-        for command_set in command_list:
-            do_each_command(command_set)
+# def load_command():
+#     with open('command.json') as commandfile:
+#         content = json.load(commandfile)
+#         device_name = content['Device']
+#         print("Device name: {}".format(device_name))
+#         device_uuid = content['uuid']
+#         print("Device uuid: {}".format(device_uuid))
+#         global device_addr
+#         device_addr = content['address']
+#         print("Device address: {}".format(device_addr))
+#         global ep
+#         ep = content['ep']
+#         print("ep: {}".format(ep))
+#         command_list = content['command_list']
+#         for command_set in command_list:
+#             do_each_command(command_set)
 
-def do_each_command(command):
-    config_file = command['command'] + ".json"
-    iteration = command['iteration']
-    for i in range(iteration):
-        do_individual_job(config_file)  
+# def do_each_command(command):
+#     config_file = command['command'] + ".json"
+#     iteration = command['iteration']
+#     for i in range(iteration):
+#         do_individual_job(config_file)  
 
-def do_individual_job(config):
-    with open(config) as configfile:
-        data = json.load(configfile)
-        connection_type = data['connection']
-        print("\nConnection type: {}".format(connection_type))
-        if connection_type == "Zigbee":
-            command = data['command']
-            print("Command: {}".format(command))
-            payloads = []
-            if config.split("/")[-1].find("onoff") == -1:
-                payloads = data['payloads']
-                print("Payloads: {}".format(payloads))
-            attribute = make_attr(command, device_addr, ep, format_payload(payloads))
-            zigbee_write(attribute)
-        else:
-            service = data['service']
-            service_uuid = service['uuid']
-            print("Service uuid: {}".format(service_uuid))
-            service_char = service['characteristics']
-            char_uuid = service_char['uuid']
-            print("Characteristic uuid: {}".format(char_uuid))
-            char_type = service_char['type']
-            print("Characteristic type: {}".format(char_type))
+# def do_individual_job(config):
+#     with open(config) as configfile:
+#         data = json.load(configfile)
+#         connection_type = data['connection']
+#         print("\nConnection type: {}".format(connection_type))
+#         if connection_type == "Zigbee":
+#             command = data['command']
+#             print("Command: {}".format(command))
+#             payloads = []
+#             if config.split("/")[-1].find("onoff") == -1:
+#                 payloads = data['payloads']
+#                 print("Payloads: {}".format(payloads))
+#             attribute = make_attr(command, device_addr, ep, format_payload(payloads))
+#             zigbee_write(attribute)
+#         else:
+#             service = data['service']
+#             service_uuid = service['uuid']
+#             print("Service uuid: {}".format(service_uuid))
+#             service_char = service['characteristics']
+#             char_uuid = service_char['uuid']
+#             print("Characteristic uuid: {}".format(char_uuid))
+#             char_type = service_char['type']
+#             print("Characteristic type: {}".format(char_type))
 
 def format_payload(payload):
     if payload == "None":
         return
-    types_map = {"TYPES.BOOL": TYPES.BOOL,
+    types_map = {
+        "TYPES.BOOL": TYPES.BOOL,
         "TYPES.UINT8": TYPES.UINT8,
         "TYPES.UINT16": TYPES.UINT16, 
         "TYPES.UINT32": TYPES.UINT32,
@@ -220,26 +221,26 @@ def format_payload(payload):
         result.append((value, value_type))
     return result
 
-def zigbee_write(attribute):
-    global ZIGBEE_STARTED
-    if ZIGBEE_STARTED == False:
-        try:
-            global cli_instance
-            cli_instance = ZbCliDevice('','','COM13')
-            cli_instance.bdb.channel = [24]
-            cli_instance.bdb.role = 'zr'
-        except serial.serialutil.SerialException:
-            cli_instance.close_cli()
-            return None
-        cli_instance.bdb.start()
-        ZIGBEE_STARTED = True
+# def zigbee_write(attribute):
+#     global ZIGBEE_STARTED
+#     if ZIGBEE_STARTED == False:
+#         try:
+#             global cli_instance
+#             cli_instance = ZbCliDevice('','','COM13')
+#             cli_instance.bdb.channel = [24]
+#             cli_instance.bdb.role = 'zr'
+#         except serial.serialutil.SerialException:
+#             cli_instance.close_cli()
+#             return None
+#         cli_instance.bdb.start()
+#         ZIGBEE_STARTED = True
 
-    if attribute.payload == []:
-        cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id)
-        # x = cli_instance.zcl.raw(eui64= addr, ep = attribute.ep, cluster = attribute.cluster, payload_hex=attribute.payload)
-        # print(x)
-    else:
-        cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
+#     if attribute.payload == []:
+#         cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id)
+#         # x = cli_instance.zcl.raw(eui64= addr, ep = attribute.ep, cluster = attribute.cluster, payload_hex=attribute.payload)
+#         # print(x)
+#     else:
+#         cli_instance.zcl.generic(eui64= attribute.eui64, ep = attribute.ep, profile=DEFAULT_ZIGBEE_PROFILE_ID, cluster=attribute.cluster, cmd_id=attribute.cmd_id, payload=attribute.payload)
 
 if __name__ == "__main__":
     # find_dongle_port()

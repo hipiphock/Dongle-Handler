@@ -1,46 +1,49 @@
 # Dongle handler
 **nRF52840 dongle handler with BLE, Zigbee command functions**
+The dongle handler is a python program that sends BLE/Zigbee messages to some appropriate devices with json files, containing a sequence of commands in it.
 
-주어진 json 파일을 이용하여서 명령을 내린다.
-
+# Build & Execution
+To execute,
 ``` shell
-$ python3 command.py command.json
+$ python3 test.py
 ```
+To execute the program, you need **command.json** file and a set of **./config/<CONNECTION_TYPE>/<COMMAND>.json** files.
 
-이때, command.json은 다음과 같은 형식을 가진다.
-
+The **command.json** file consists like this kind of form:
 ``` json
 {
-    "command":[
-        "config1.json", 
-        "config2.json", 
-        "config3.json", 
-        "config4.json", 
-        "config5.json", 
-        "config6.json", 
-        "config7.json", 
-        "config8.json", 
-        "config9.json", 
-        "config10.json"
+    "Device": "Ultra Thin Wafer",
+    "uuid": "asdf-qwer-zxcv",
+    "address": "0xe48f",
+    "ep": "8",
+    "command_list": [
+        {
+            "command": "./config/Zigbee/config_zigbee_onoff_on",
+            "iteration": 1
+        },
+        {
+            "command": "./config/Zigbee/config_zigbee_onoff_off",
+            "iteration": 1
+        }
     ]
 }
 ```
 
-json 안에 들어가는 config.json의 경우 다음과 같은 형식을 가진다.
-
+The **config.json** file consists like this kind of form:
 ``` json
 {
-    "Device":"Ultra Thin Wafer",
-    "uuid": "qwer-asdf-zxcv",
-    "connection":"BLE",
-    "service":{
-        "uuid": "4cc49cc9-bde6-4b43-8c51-93785dd7873e",
-        "characteristics":{
-            "uuid":"qwer-asdf-zxcv",
-            "type":"write",
-            "value":"0x0001"
+    "connection": "Zigbee",
+    "command": "LVL_CTRL_MV_TO_LVL_CMD",
+    "payloads": [
+        {
+            "value": "0x05",
+            "type": "TYPES.UINT8"
+        },
+        {
+            "value": "0x00",
+            "type": "TYPES.UINT16"
         }
-    }
+    ]
 }
 ```
 
@@ -56,16 +59,19 @@ pip3 install blatann
 
 # Hardware Requirements
 This program is made for nRF52840 dongle from Nordic Semiconductor.
-## On connection,
+Not only you need this dongle for execution, but also you must write the following hex file to your dongle:
+[link](https://github.com)
+When setthing the serial connection with dongle and PC:
  * 115200 bit/s,
  * 8-bit-long word,
  * no parity,
  * 1-bit stop.
 
-would be required between PC and dongle.
+would be required to be set.
 
-# Todo
+# Future Goal
  * Update BLE & Zigbee configuration files.
- * Make an interface between PC and dongle.
  * Unify BLE CLI and Zigbee CLI.
  * Implement the return fetching part.
+ * Complete the light-color change part.
+ * Implement the GUI for this python program.

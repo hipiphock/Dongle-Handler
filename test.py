@@ -40,8 +40,6 @@ class CommandSet:
             addr    = content['address']
             ep      = content['ep']
             cmds    = content['command_list']
-            # TODO: additioinal handling to make
-            # cmdlist as one pair of config and iteration
             cmdlist = []
             for cmd in cmds:
                 configfile  = cmd['command'] + ".json"
@@ -61,6 +59,7 @@ class CommandSet:
     # does the individual process of Zigbee command
     # or BLE service
     def do_individual_job(self, config):
+        print(config.command)
         if config.connection == 'Zigbee':
             global ZIGBEE_STARTED
             global cli_instance
@@ -77,7 +76,7 @@ class CommandSet:
             attribute = make_attr(config.command,
                     self.addr, 
                     self.ep, 
-                    format_payload(config.payloads))
+                    config.payloads)
             if attribute.payload == []:
                 cli_instance.zcl.generic(eui64= attribute.eui64, 
                         ep = attribute.ep,
@@ -103,11 +102,11 @@ class Config:
     @classmethod
     def make_instance(cls, configfile):
         with open(configfile) as config_file:
-            print(configfile)
             content = json.load(config_file)
             connection  = content['connection']
             command     = content['command']
-            payloads    = content['payloads']
+            payload     = content['payloads']
+            payloads    = format_payload(payload)
             # additional job required for payloads:
             # - the generic function gets payloads as lists of tuples
         return cls(connection, command, payloads)
@@ -143,7 +142,7 @@ def make_attr(command_str, address, ep, payloads):
         #     attr_id = COLOR_CTRL_CURR_HUE_ATTR
         # elif command_str.find("TO_SAT_CMD") != -1:
         #     attr_id = COLOR_CTRL_CURR_SAT_ATTR
-    addr = int(device_addr, 16)
+    addr = int(address, 16)
     return ZigbeeAttr(addr, ep, cluster, command_int, payloads)
 
 # parses command
@@ -195,18 +194,20 @@ def do_individual_job(config):
             print("Characteristic type: {}".format(char_type))
 
 def format_payload(payload):
+    if payload == "None":
+        return
     types_map = {"TYPES.BOOL": TYPES.BOOL,
-    "TYPES.UINT8": TYPES.UINT8,
-    "TYPES.UINT16": TYPES.UINT16, 
-    "TYPES.UINT32": TYPES.UINT32,
-    "TYPES.UINT64": TYPES.UINT64,
-    "TYPES.SINT8": TYPES.SINT8,
-    "TYPES.SINT16": TYPES.SINT16,
-    "TYPES.SINT64": TYPES.SINT64, 
-    "TYPES.ENUM8": TYPES.ENUM8,
-    "TYPES.MAP8": TYPES.MAP8, 
-    "TYPES.EUI64": TYPES.EUI64,
-    "TYPES.STRING": TYPES.STRING }
+        "TYPES.UINT8": TYPES.UINT8,
+        "TYPES.UINT16": TYPES.UINT16, 
+        "TYPES.UINT32": TYPES.UINT32,
+        "TYPES.UINT64": TYPES.UINT64,
+        "TYPES.SINT8": TYPES.SINT8,
+        "TYPES.SINT16": TYPES.SINT16,
+        "TYPES.SINT64": TYPES.SINT64, 
+        "TYPES.ENUM8": TYPES.ENUM8,
+        "TYPES.MAP8": TYPES.MAP8, 
+        "TYPES.EUI64": TYPES.EUI64,
+        "TYPES.STRING": TYPES.STRING }
     result = []
     for item in payload:
         value_type = types_map[item['type']]

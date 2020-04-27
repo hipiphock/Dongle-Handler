@@ -1,3 +1,4 @@
+import sys
 import json
 import random
 import serial
@@ -62,17 +63,17 @@ class CommandSet:
         if config.connection == 'Zigbee':
             global ZIGBEE_STARTED
             global cli_instance
-            # if ZIGBEE_STARTED == False:
-            #     try:
-            #         print("Starting Zigbee Connection...")
-            cli_instance = ZbCliDevice('','','COM13')
-            #         cli_instance.bdb.channel = [24]
-            #         cli_instance.bdb.role = 'zr'
-            #         cli_instance.bdb.start()
-            #         ZIGBEE_STARTED = True
-            #     except serial.serialutil.SerialException:
-            #         cli_instance.close_cli()
-            #         return None
+            if ZIGBEE_STARTED == False:
+                try:
+                    print("Starting Zigbee Connection...")
+                    cli_instance = ZbCliDevice('','','COM13')
+                    cli_instance.bdb.channel = [24]
+                    cli_instance.bdb.role = 'zr'
+                    cli_instance.bdb.start()
+                    ZIGBEE_STARTED = True
+                except serial.serialutil.SerialException:
+                    cli_instance.close_cli()
+                    return None
             attribute = make_attr(self.addr, self.ep,
                     config.command, config.payloads)
             print("address: {}".format(attribute.eui64))
@@ -147,17 +148,17 @@ def format_payload(payload):
     if payload == "None":
         return
     types_map = {
-        "TYPES.BOOL": TYPES.BOOL,
-        "TYPES.UINT8": TYPES.UINT8,
+        "TYPES.BOOL":   TYPES.BOOL,
+        "TYPES.UINT8":  TYPES.UINT8,
         "TYPES.UINT16": TYPES.UINT16, 
         "TYPES.UINT32": TYPES.UINT32,
         "TYPES.UINT64": TYPES.UINT64,
-        "TYPES.SINT8": TYPES.SINT8,
+        "TYPES.SINT8":  TYPES.SINT8,
         "TYPES.SINT16": TYPES.SINT16,
         "TYPES.SINT64": TYPES.SINT64, 
-        "TYPES.ENUM8": TYPES.ENUM8,
-        "TYPES.MAP8": TYPES.MAP8, 
-        "TYPES.EUI64": TYPES.EUI64,
+        "TYPES.ENUM8":  TYPES.ENUM8,
+        "TYPES.MAP8":   TYPES.MAP8, 
+        "TYPES.EUI64":  TYPES.EUI64,
         "TYPES.STRING": TYPES.STRING }
     result = []
     for item in payload:
@@ -169,11 +170,30 @@ def format_payload(payload):
         result.append((value, value_type))
     return result
 
-
+# main routine
 if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print("You must select either interactive mode or batch mode.")
+        print("Usage: python3 main.py <-I or -B> <if -B: filename>")
+    else:
+        if sys.argv[1] == '-I':
+            print("Interactive Mode:")
+            cli_instance = ZbCliDevice('','','COM13')
+            cli_instance.bdb.channel = [24]
+            cli_instance.bdb.role = 'zr'
+            cli_instance.bdb.start()
+            ZIGBEE_STARTED = True
+        elif sys.argv[1] == '-B':
+            print("Batch Mode:")
+            ZIGBEE_STARTED = True
+            commander_file = sys.argv[2]
+            commander = CommandSet.make_instance(commander_file)
+            commander.start_routine()
+        else:
+            print("You must select either interactive mode or batch mode.")
     # find_dongle_port()
-    commander = CommandSet.make_instance('command1.json')
-    commander.start_routine()
+    # commander = CommandSet.make_instance(commander_file)
+    # commander.start_routine()
     # ser = serial.Serial('COM13')
     # ser.write(b'reset')
     # ser.close()

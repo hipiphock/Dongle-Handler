@@ -1,0 +1,12 @@
+{
+    "Device": "Ultra Thin Wafer",
+    "uuid": "asdf-qwer-zxcv",
+    "address": "0x73b4",
+    "ep": "8",
+    "command_list": [
+        {
+            "command": "./config/Zigbee/config_zigbee_onoff_on",
+            "iteration": 1
+        }
+    ]
+}

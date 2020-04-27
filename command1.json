@@ -5,7 +5,7 @@
     "ep": "8",
     "command_list": [
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_on",
+            "command": "./config/Zigbee/config_zigbee_onoff_off",
             "iteration": 1
         }
     ]

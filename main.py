@@ -189,10 +189,16 @@ if __name__ == "__main__":
                 usr_cmd = input()
                 if usr_cmd == 'off':
                     print("turning off the light")
-                    cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
+                    cli_instance.zcl.generic(eui64, 
+                            8, ON_OFF_CLUSTER, 
+                            DEFAULT_ZIGBEE_PROFILE_ID, 
+                            ON_OFF_OFF_CMD)
                 elif usr_cmd == 'on':
                     print("turning on the light")
-                    cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_ON_CMD)
+                    cli_instance.zcl.generic(eui64, 
+                            8, ON_OFF_CLUSTER, 
+                            DEFAULT_ZIGBEE_PROFILE_ID, 
+                            ON_OFF_ON_CMD)
                 elif usr_cmd == 'exit' or usr_cmd == 'quit' or usr_cmd == 'q':
                     # exit
                     print("exit")

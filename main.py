@@ -179,11 +179,11 @@ if __name__ == "__main__":
         if sys.argv[1] == '-I':
             print("Interactive Mode:")
             cli_instance = ZbCliDevice('','','COM13')
-            cli_instance.bdb.channel = [24]
-            cli_instance.bdb.role = 'zr'
-            cli_instance.bdb.start()
+            # cli_instance.bdb.channel = [24]
+            # cli_instance.bdb.role = 'zr'
+            # cli_instance.bdb.start()
             # rough coding: turning light on and off
-            eui64 = int('f4ce362658dc0ce5', 16)
+            eui64 = int('88571DFFFE0E5416', 16)
             while True:
                 print("Enter input:")
                 usr_cmd = input()

@@ -182,10 +182,23 @@ if __name__ == "__main__":
             cli_instance.bdb.channel = [24]
             cli_instance.bdb.role = 'zr'
             cli_instance.bdb.start()
-            ZIGBEE_STARTED = True
+            # rough coding: turning light on and off
+            eui64 = int('f4ce362658dc0ce5', 16)
+            while True:
+                print("Enter input:")
+                usr_cmd = input()
+                if usr_cmd == 'off':
+                    print("turning off the light")
+                    cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
+                elif usr_cmd == 'on':
+                    print("turning on the light")
+                    cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_ON_CMD)
+                elif usr_cmd == 'exit':
+                    # exit
+                    print("exit")
+                    cli_instance.close_cli()
         elif sys.argv[1] == '-B':
             print("Batch Mode:")
-            ZIGBEE_STARTED = True
             commander_file = sys.argv[2]
             commander = CommandSet.make_instance(commander_file)
             commander.start_routine()

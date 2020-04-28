@@ -3,7 +3,7 @@
     "command": "LVL_CTRL_MV_TO_LVL_CMD",
     "payloads": [
         {
-            "value": "0x05",
+            "value": "0x0F",
             "type": "TYPES.UINT8"
         },
         {

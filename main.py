@@ -193,10 +193,12 @@ if __name__ == "__main__":
                 elif usr_cmd == 'on':
                     print("turning on the light")
                     cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_ON_CMD)
-                elif usr_cmd == 'exit':
+                elif usr_cmd == 'exit' or usr_cmd == 'quit' or usr_cmd == 'q':
                     # exit
                     print("exit")
                     cli_instance.close_cli()
+                    exit()
+
         elif sys.argv[1] == '-B':
             print("Batch Mode:")
             commander_file = sys.argv[2]

@@ -3,6 +3,7 @@ import json
 import random
 import serial
 import logging
+import time
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.cmd_wrappers.zigbee.constants import *
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
@@ -217,6 +218,7 @@ if __name__ == "__main__":
                     cli_instance.zcl.generic(eui64, 8, LVL_CTRL_CLUSTER,
                             DEFAULT_ZIGBEE_PROFILE_ID, 
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=low_payload)
+                    time.sleep(3)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # set light level into 'mid'
                 elif usr_cmd == 'mid':
@@ -225,6 +227,7 @@ if __name__ == "__main__":
                     cli_instance.zcl.generic(eui64, 8, LVL_CTRL_CLUSTER, 
                             DEFAULT_ZIGBEE_PROFILE_ID,
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=mid_payload)
+                    time.sleep(3)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # set light level into 'high'
                 elif usr_cmd == 'high':
@@ -233,6 +236,7 @@ if __name__ == "__main__":
                     cli_instance.zcl.generic(eui64, 8, LVL_CTRL_CLUSTER, 
                             DEFAULT_ZIGBEE_PROFILE_ID, 
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=high_payload)
+                    time.sleep(3)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # custom level controller
                 elif usr_cmd == 'level':

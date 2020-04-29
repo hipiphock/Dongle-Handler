@@ -1,4 +1,5 @@
 {
     "connection":   "Zigbee",
-    "command":      "ON_OFF_ON_CMD"
+    "command":      "ON_OFF_ON_CMD",
+    "payloads":     "None"
 }

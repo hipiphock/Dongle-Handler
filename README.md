@@ -1,13 +1,23 @@
 # Dongle handler
 **nRF52840 dongle handler with BLE, Zigbee command functions**
-The dongle handler is a python program that sends BLE/Zigbee messages to some appropriate devices with json files, containing a sequence of commands in it.
 
-# Build & Execution
+The dongle handler is a python program that sends and receives BLE/Zigbee messages to some appropriate devices.
+
+It supports both batch mode and interactive mode.
+
+# Build
+So far, there is no need to build the program. You just need prerequistic libraries.
+``` shell
+pip3 install zb-cli-wrapper
+pip3 install blatann
+```
+
+# Execution
 To execute,
 ``` shell
 $ python3 test.py
 ```
-To execute the program, you need **command.json** file and a set of **./config/<CONNECTION_TYPE>/<COMMAND>.json** files.
+To execute the program in batch mode, you need **command.json** file and a set of **./config/<CONNECTION_TYPE>/<COMMAND>.json** files.
 
 The **command.json** file consists like this kind of form:
 ``` json
@@ -28,6 +38,7 @@ The **command.json** file consists like this kind of form:
     ]
 }
 ```
+It contains the target device's information, and a sequence of command list.
 
 The **config.json** file consists like this kind of form:
 ``` json
@@ -43,19 +54,15 @@ The **config.json** file consists like this kind of form:
             "value": "0x00",
             "type": "TYPES.UINT16"
         }
-    ]
+    ],
+    "duration": "2"
 }
 ```
+Each config.json files specifies the type of connection they are willing to connect, a specific command to send, and payloads if necessary.
 
 통신을 하려는 device의 정보(이름과 uuid)와 통신하는 방식을 정의한 후, 원하는 service와 해당 service의 characteristic 중 하나에 대해서 대해서 상세하게 서술한다.
 
 해당 characteristic의 type이 read인지, write인지, notify인지에 따라서 value를 보낼 것인지 받을 것인지가 달라진다.
-
-# Build
-``` shell
-pip3 install zb-cli-wrapper
-pip3 install blatann
-```
 
 # Hardware Requirements
 This program is made for nRF52840 dongle from Nordic Semiconductor.
@@ -69,9 +76,10 @@ When setthing the serial connection with dongle and PC:
 
 would be required to be set.
 
-# Future Goal
- * Update BLE & Zigbee configuration files.
- * Unify BLE CLI and Zigbee CLI.
- * Implement the return fetching part.
- * Complete the light-color change part.
- * Implement the GUI for this python program.
+# Future Goals & TODO lists
+ * Updating BLE & Zigbee configuration files.
+ * Unifying BLE CLI and Zigbee CLI.
+ * Implementing the return fetching part.
+ * Completing the light-color change part.
+ * Implementing the GUI for this python program.
+ * Implementing logger

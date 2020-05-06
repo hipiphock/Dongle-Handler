@@ -4,8 +4,9 @@ import random
 import serial
 import logging
 import time
+from constants import *
+from connectionlogger import ConnectionLogger
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
-from zb_cli_wrapper.src.utils.cmd_wrappers.zigbee.constants import *
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
 
 ZIGBEE_STARTED = False
@@ -19,8 +20,7 @@ def find_dongle_port():
         # TODO: Implement automated port selector
         pass
 
-# representing command.json file,
-# CommandSet defines:
+# representing command.json file, CommandSet defines:
 # - Device's information
 # - Sequences of commands and its number of iterations
 class CommandSet:
@@ -43,7 +43,7 @@ class CommandSet:
             cmds    = content['command_list']
             cmdlist = []
             for cmd in cmds:
-                configfile  = cmd['command'] + ".json"
+                configfile  = cmd['command']
                 iteration   = cmd['iteration']
                 config = Config.make_instance(configfile)
                 cmdlist.append({'config':config, 'iteration':iteration})
@@ -55,13 +55,11 @@ class CommandSet:
             config      = command['config']
             iteration   = command['iteration']
             for i in range(iteration):
+                print("{}th iteration:".format(i))
                 self.do_individual_job(config)
-            # global cli_instance
-            # cli_instance.close_cli()
             print("command routine finished")
 
-    # does the individual process of Zigbee command
-    # or BLE service
+    # does the individual process of Zigbee command or BLE service
     def do_individual_job(self, config):
         if config.connection == 'Zigbee':
             global ZIGBEE_STARTED
@@ -79,18 +77,22 @@ class CommandSet:
                     return None
             attribute = make_attr(self.addr, self.ep,
                     config.command, config.payloads)
-            print("address: {}".format(attribute.eui64))
-            print("endpoint: {}".format(attribute.ep))
-            print("cluster: {}".format(attribute.cluster))
-            print("cmd: {}".format(attribute.cmd_id))
-            print("payloads: {}".format(attribute.payload))
+            # print("address: {}".format(attribute.eui64))
+            # print("endpoint: {}".format(attribute.ep))
+            # print("cluster: {}".format(attribute.cluster))
+            # print("cmd: {}".format(attribute.cmd_id))
+            # print("payloads: {}".format(attribute.payload))
+            # case: command without payload
+            # example: on & off
             if attribute.payload == []:
                 cli_instance.zcl.generic(
                         eui64= attribute.eui64, 
                         ep = attribute.ep,
                         profile=DEFAULT_ZIGBEE_PROFILE_ID,
                         cluster=attribute.cluster, 
-                        cmd_id=attribute.cmd_id)                
+                        cmd_id=attribute.cmd_id)
+            # case: command that needs payload
+            # example: level control & color control
             else:
                 cli_instance.zcl.generic(
                         eui64= attribute.eui64, 
@@ -99,14 +101,28 @@ class CommandSet:
                         cluster=attribute.cluster, 
                         cmd_id=attribute.cmd_id, 
                         payload=attribute.payload)
+            time.sleep(config.duration)
+            # TODO: implementing logging part
+            # cli_instance.zcl.readattr(
+            #         eui64= attribute.eui64, 
+            #         level_attr,
+            #         ep=ULTRA_THIN_WAFER_ENDPOINT)
+            # zigbee_logger = ConnectionLogger(1, command, retval)
+            # zigbee_logger.write_log()
+        elif config.connection == 'BLE':
+            pass
+        else:
+            print("UNSUPPORTED TYPE OF CONNECTION.")
+            exit(1)
 
 # class representing config.json files
 # each config file's should be made by this inner class
 class Config:
-    def __init__(self, connection, command, payloads=None):
+    def __init__(self, connection, command, payloads=None, duration=0):
         self.connection = connection
         self.command = command
         self.payloads = payloads
+        self.duration = duration
     
     @classmethod
     def make_instance(cls, configfile):
@@ -115,10 +131,9 @@ class Config:
             connection  = content['connection']
             command     = content['command']
             payload     = content['payloads']
+            duration    = content['duration']
             payloads    = format_payload(payload)
-            # additional job required for payloads:
-            # - the generic function gets payloads as lists of tuples
-        return cls(connection, command, payloads)
+        return cls(connection, command, payloads, duration)
         
 # defines Zigbee Attribute
 class ZigbeeAttr:
@@ -132,11 +147,12 @@ class ZigbeeAttr:
 def make_attr(address, ep, command, payloads):
     command_map = { "ON_OFF_OFF_CMD":   ON_OFF_OFF_CMD, 
                     "ON_OFF_ON_CMD":    ON_OFF_ON_CMD,
+                    "ON_OFF_TOGGLE_CMD":        ON_OFF_TOGGLE_CMD,
                     "LVL_CTRL_MV_TO_LVL_CMD":   LVL_CTRL_MV_TO_LVL_CMD,
                     "COLOR_CTRL_MV_TO_HUE_CMD":     COLOR_CTRL_MV_TO_HUE_CMD,
                     "COLOR_CTRL_MV_TO_SAT_CMD":     COLOR_CTRL_MV_TO_SAT_CMD,
                     "COLOR_CTRL_MV_TO_HUE_SAT_CMD": COLOR_CTRL_MV_TO_HUE_SAT_CMD}
-    command_int = command_map[command]
+    cmd_num = command_map[command]
     cluster = 0
     if command.find("ON_OFF") != -1:
         cluster = ON_OFF_CLUSTER
@@ -145,8 +161,9 @@ def make_attr(address, ep, command, payloads):
     elif command.find("COLOR_CTRL") != -1:
         cluster = COLOR_CTRL_CLUSTER
     addr = int(address, 16)
-    return ZigbeeAttr(addr, ep, cluster, command_int, payloads)
+    return ZigbeeAttr(addr, ep, cluster, cmd_num, payloads)
 
+# TODO: generating random variable
 def format_payload(payload):
     if payload == "None":
         return
@@ -166,6 +183,7 @@ def format_payload(payload):
     result = []
     for item in payload:
         value_type = types_map[item['type']]
+
         if value_type is not TYPES.STRING:
             value = int(item['value'], 16)
         else:
@@ -175,27 +193,25 @@ def format_payload(payload):
 
 # main routine
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)    # for logging
     if len(sys.argv) == 1:
         print("You must select either interactive mode or batch mode.")
         print("Usage: python3 main.py <-I or -B> <if -B: filename>")
     else:
         # interactive mode
-        if sys.argv[1] == '-I':
-            print("Interactive Mode:")
+        if sys.argv[1] == '-I' or '-i':
+            print("INTERACTIVE MODE")
             cli_instance = ZbCliDevice('','','COM13')
             # cli_instance.bdb.channel = [24]
             # cli_instance.bdb.role = 'zr'
             # cli_instance.bdb.start()
             # rough coding: turning light on and off
             eui64 = int('88571DFFFE0E5416', 16)
-            # attr = Attribute(6, 1, TYPES.BOOL)
-            # cli_instance.zcl.subscribe(eui64, 8, ON_OFF_CLUSTER, attr)
             off_attr    = Attribute(ON_OFF_CLUSTER, ON_OFF_ONOFF_ATTR,
                                     TYPES.BOOL, ON_OFF_OFF_CMD)
             on_attr     = Attribute(ON_OFF_CLUSTER, ON_OFF_ONOFF_ATTR,
                                     TYPES.BOOL, ON_OFF_ON_CMD)
-            level_attr    = Attribute(LVL_CTRL_CLUSTER, LVL_CTRL_CURR_LVL_ATTR,
+            level_attr  = Attribute(LVL_CTRL_CLUSTER, LVL_CTRL_CURR_LVL_ATTR,
                                     TYPES.UINT8)
             while True:
                 print("Enter input:")
@@ -203,7 +219,8 @@ if __name__ == "__main__":
                 # off command
                 if usr_cmd == 'off':
                     print("turning off the light")
-                    cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
+                    cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, 
+                            DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
                     cli_instance.zcl.readattr(eui64, off_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # on command
                 elif usr_cmd == 'on':
@@ -218,7 +235,7 @@ if __name__ == "__main__":
                     cli_instance.zcl.generic(eui64, 8, LVL_CTRL_CLUSTER,
                             DEFAULT_ZIGBEE_PROFILE_ID, 
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=low_payload)
-                    time.sleep(3)
+                    time.sleep(1)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # set light level into 'mid'
                 elif usr_cmd == 'mid':
@@ -227,7 +244,7 @@ if __name__ == "__main__":
                     cli_instance.zcl.generic(eui64, 8, LVL_CTRL_CLUSTER, 
                             DEFAULT_ZIGBEE_PROFILE_ID,
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=mid_payload)
-                    time.sleep(3)
+                    time.sleep(1)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # set light level into 'high'
                 elif usr_cmd == 'high':
@@ -236,7 +253,7 @@ if __name__ == "__main__":
                     cli_instance.zcl.generic(eui64, 8, LVL_CTRL_CLUSTER, 
                             DEFAULT_ZIGBEE_PROFILE_ID, 
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=high_payload)
-                    time.sleep(3)
+                    time.sleep(1)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # custom level controller
                 elif usr_cmd == 'level':
@@ -254,8 +271,8 @@ if __name__ == "__main__":
                     cli_instance.close_cli()
                     exit()
         # batch mode
-        elif sys.argv[1] == '-B':
-            print("Batch Mode:")
+        elif sys.argv[1] == '-B' or '-b':
+            print("BATCH MODE")
             commander_file = sys.argv[2]
             commander = CommandSet.make_instance(commander_file)
             commander.start_routine()

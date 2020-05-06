@@ -3,12 +3,13 @@
     "command": "LVL_CTRL_MV_TO_LVL_CMD",
     "payloads": [
         {
-            "value": "0x0F",
+            "value": "0x02",
             "type": "TYPES.UINT8"
         },
         {
             "value": "0x00",
             "type": "TYPES.UINT16"
         }
-    ]
+    ],
+    "duration":     "1"
 }

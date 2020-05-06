@@ -5,8 +5,8 @@
     "ep": "8",
     "command_list": [
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_on",
-            "iteration": 1
+            "command": "./config/Zigbee/ON_OFF_toggle.json",
+            "iteration": 50
         }
     ]
 }

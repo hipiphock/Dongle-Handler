@@ -5,8 +5,8 @@
     "ep": "8",
     "command_list": [
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_off",
-            "iteration": 1
+            "command": "./config/Zigbee/LVL_CTRL_random.json",
+            "iteration": 50
         }
     ]
 }

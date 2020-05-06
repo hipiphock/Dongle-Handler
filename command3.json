@@ -5,27 +5,27 @@
     "ep": "8",
     "command_list": [
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_on",
+            "command": "./config/Zigbee/ON_OFF_on.json",
             "iteration": 1
         },
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_off",
+            "command": "./config/Zigbee/ON_OFF_off.json",
             "iteration": 1
         }, 
         {
-            "command": "./config/Zigbee/config_zigbee_level_control_1",
+            "command": "./config/Zigbee/LVL_CTRL_low.json",
             "iteration": 1
         },
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_on",
+            "command": "./config/Zigbee/ON_OFF_on.json",
             "iteration": 1
         },
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_off",
+            "command": "./config/Zigbee/ON_OFF_off.json",
             "iteration": 1
         },
         {
-            "command": "./config/Zigbee/config_zigbee_onoff_on",
+            "command": "./config/Zigbee/ON_OFF_on.json",
             "iteration": 1
         }
     ]

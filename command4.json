@@ -1,0 +1,14 @@
+{
+    "Device": "Ultra Thin Wafer",
+    "uuid": "asdf-qwer-zxcv",
+    "address": "FFFE88571D018E53",
+    "ep": "8",
+    "command_list": [
+        {
+            "command": ["./config/Zigbee/On_Off_on.json",
+                        "./config/Zigbee/On_Off_off.json"
+            ],
+            "iteration": 50
+        }
+    ]
+}

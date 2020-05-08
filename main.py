@@ -43,20 +43,31 @@ class CommandSet:
             cmds    = content['command_list']
             cmdlist = []
             for cmd in cmds:
-                configfile  = cmd['command']
+                # TODO: make command array inside each command block
+                configs     = cmd['command']
                 iteration   = cmd['iteration']
-                config = Config.make_instance(configfile)
-                cmdlist.append({'config':config, 'iteration':iteration})
+                configlist  = []
+                for config in configs:
+                    configlist.append(Config.make_instance(config))
+                cmdlist.append({'config':configlist, 'iteration':iteration})
         return cls(name, uuid, addr, ep, cmdlist)
+
+    # method for handling each block of procedures
+    def cmdfile_handler(self, cmdlists):
+        # comdlists consists of command arrays
+        cmd = cmdlists['']
+        
+
 
     # main procedure of command.json
     def start_routine(self):
         for command in self.cmdlist:
-            config      = command['config']
+            configlist  = command['config']
             iteration   = command['iteration']
             for i in range(iteration):
                 print("{}th iteration:".format(i))
-                self.do_individual_job(config)
+                for config in configlist:
+                    self.do_individual_job(config)
             print("command routine finished")
 
     # does the individual process of Zigbee command or BLE service
@@ -68,20 +79,15 @@ class CommandSet:
                 try:
                     print("Starting Zigbee Connection...")
                     cli_instance = ZbCliDevice('','','COM13')
-                    cli_instance.bdb.channel = [24]
-                    cli_instance.bdb.role = 'zr'
-                    cli_instance.bdb.start()
+                    # cli_instance.bdb.channel = [24]
+                    # cli_instance.bdb.role = 'zr'
+                    # cli_instance.bdb.start()
                     ZIGBEE_STARTED = True
                 except serial.serialutil.SerialException:
                     cli_instance.close_cli()
                     return None
             attribute = make_attr(self.addr, self.ep,
                     config.command, config.payloads)
-            # print("address: {}".format(attribute.eui64))
-            # print("endpoint: {}".format(attribute.ep))
-            # print("cluster: {}".format(attribute.cluster))
-            # print("cmd: {}".format(attribute.cmd_id))
-            # print("payloads: {}".format(attribute.payload))
             # case: command without payload
             # example: on & off
             if attribute.payload == []:
@@ -101,8 +107,8 @@ class CommandSet:
                         cluster=attribute.cluster, 
                         cmd_id=attribute.cmd_id, 
                         payload=attribute.payload)
-            time.sleep(config.duration)
-            # TODO: implementing logging part
+            time.sleep(int(config.duration))
+            # TODO: implement logging part
             # cli_instance.zcl.readattr(
             #         eui64= attribute.eui64, 
             #         level_attr,
@@ -134,7 +140,7 @@ class Config:
             duration    = content['duration']
             payloads    = format_payload(payload)
         return cls(connection, command, payloads, duration)
-        
+
 # defines Zigbee Attribute
 class ZigbeeAttr:
     def __init__(self, _eui64, _ep, _cluster, _cmd_id, _payload):
@@ -191,6 +197,12 @@ def format_payload(payload):
         result.append((value, value_type))
     return result
 
+def initialization():
+    global cli_instance
+    cli_instance.bdb.channel = [24]
+    cli_instance.bdb.role = 'zr'
+    cli_instance.bdb.start()
+
 # main routine
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)    # for logging
@@ -199,7 +211,7 @@ if __name__ == "__main__":
         print("Usage: python3 main.py <-I or -B> <if -B: filename>")
     else:
         # interactive mode
-        if sys.argv[1] == '-I' or '-i':
+        if sys.argv[1] == '-I':
             print("INTERACTIVE MODE")
             cli_instance = ZbCliDevice('','','COM13')
             # cli_instance.bdb.channel = [24]
@@ -271,7 +283,7 @@ if __name__ == "__main__":
                     cli_instance.close_cli()
                     exit()
         # batch mode
-        elif sys.argv[1] == '-B' or '-b':
+        elif sys.argv[1] == '-B':
             print("BATCH MODE")
             commander_file = sys.argv[2]
             commander = CommandSet.make_instance(commander_file)

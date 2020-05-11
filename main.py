@@ -20,6 +20,12 @@ def find_dongle_port():
         # TODO: Implement automated port selector
         pass
 
+
+# Attribute issue
+# Attribute basically needs attribute id to specify which attribute to read
+# For example, if you want to know whether the light is on or off,
+# you must set the attribute id into ON_OFF_ONOFF_ATTR
+
 # representing command.json file, CommandSet defines:
 # - Device's information
 # - Sequences of commands and its number of iterations
@@ -38,8 +44,10 @@ class CommandSet:
             content = json.load(commandfile)
             name    = content['Device']
             uuid    = content['uuid']
-            addr    = content['address']
-            ep      = content['ep']
+            _addr   = content['address']
+            addr    = int(_addr, 16)
+            _ep     = content['ep']
+            ep      = int(_ep, 16)
             cmds    = content['command_list']
             cmdlist = []
             for cmd in cmds:
@@ -51,13 +59,6 @@ class CommandSet:
                     configlist.append(Config.make_instance(config))
                 cmdlist.append({'config':configlist, 'iteration':iteration})
         return cls(name, uuid, addr, ep, cmdlist)
-
-    # method for handling each block of procedures
-    def cmdfile_handler(self, cmdlists):
-        # comdlists consists of command arrays
-        cmd = cmdlists['']
-        
-
 
     # main procedure of command.json
     def start_routine(self):
@@ -86,29 +87,33 @@ class CommandSet:
                 except serial.serialutil.SerialException:
                     cli_instance.close_cli()
                     return None
-            attribute = make_attr(self.addr, self.ep,
-                    config.command, config.payloads)
+            # attribute = make_attr(self.addr, self.ep, config.command, config.payloads)
             # case: command without payload
             # example: on & off
-            if attribute.payload == []:
+            if config.payloads == None:
+                print(type(self.addr))
+                print(type(self.ep))
+                print(type(config.cluster))
+                print(type(config.command))
                 cli_instance.zcl.generic(
-                        eui64= attribute.eui64, 
-                        ep = attribute.ep,
+                        eui64= self.addr, 
+                        ep = self.ep,
                         profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                        cluster=attribute.cluster, 
-                        cmd_id=attribute.cmd_id)
+                        cluster=config.cluster, 
+                        cmd_id=config.command)
             # case: command that needs payload
             # example: level control & color control
             else:
                 cli_instance.zcl.generic(
-                        eui64= attribute.eui64, 
-                        ep = attribute.ep, 
+                        eui64= self.addr,
+                        ep = self.ep, 
                         profile=DEFAULT_ZIGBEE_PROFILE_ID, 
-                        cluster=attribute.cluster, 
-                        cmd_id=attribute.cmd_id, 
-                        payload=attribute.payload)
+                        cluster=config.cluster, 
+                        cmd_id=config.command, 
+                        payload=config.payloads)
             time.sleep(int(config.duration))
             # TODO: implement logging part
+            # when reading attribute, you need to set which attribute to read.
             # cli_instance.zcl.readattr(
             #         eui64= attribute.eui64, 
             #         level_attr,
@@ -124,8 +129,9 @@ class CommandSet:
 # class representing config.json files
 # each config file's should be made by this inner class
 class Config:
-    def __init__(self, connection, command, payloads=None, duration=0):
+    def __init__(self, connection, cluster, command, payloads=None, duration=0):
         self.connection = connection
+        self.cluster = cluster
         self.command = command
         self.payloads = payloads
         self.duration = duration
@@ -135,30 +141,15 @@ class Config:
         with open(configfile) as config_file:
             content = json.load(config_file)
             connection  = content['connection']
-            command     = content['command']
+            _command    = content['command']
             payload     = content['payloads']
             duration    = content['duration']
+            cluster     = get_cluster(_command)
+            command     = format_command(_command)
             payloads    = format_payload(payload)
-        return cls(connection, command, payloads, duration)
+        return cls(connection, cluster, command, payloads, duration)
 
-# defines Zigbee Attribute
-class ZigbeeAttr:
-    def __init__(self, _eui64, _ep, _cluster, _cmd_id, _payload):
-        self.eui64 = _eui64
-        self.ep = _ep
-        self.cluster = _cluster
-        self.cmd_id = _cmd_id
-        self.payload = _payload
-        
-def make_attr(address, ep, command, payloads):
-    command_map = { "ON_OFF_OFF_CMD":   ON_OFF_OFF_CMD, 
-                    "ON_OFF_ON_CMD":    ON_OFF_ON_CMD,
-                    "ON_OFF_TOGGLE_CMD":        ON_OFF_TOGGLE_CMD,
-                    "LVL_CTRL_MV_TO_LVL_CMD":   LVL_CTRL_MV_TO_LVL_CMD,
-                    "COLOR_CTRL_MV_TO_HUE_CMD":     COLOR_CTRL_MV_TO_HUE_CMD,
-                    "COLOR_CTRL_MV_TO_SAT_CMD":     COLOR_CTRL_MV_TO_SAT_CMD,
-                    "COLOR_CTRL_MV_TO_HUE_SAT_CMD": COLOR_CTRL_MV_TO_HUE_SAT_CMD}
-    cmd_num = command_map[command]
+def get_cluster(command):
     cluster = 0
     if command.find("ON_OFF") != -1:
         cluster = ON_OFF_CLUSTER
@@ -166,13 +157,23 @@ def make_attr(address, ep, command, payloads):
         cluster = LVL_CTRL_CLUSTER
     elif command.find("COLOR_CTRL") != -1:
         cluster = COLOR_CTRL_CLUSTER
-    addr = int(address, 16)
-    return ZigbeeAttr(addr, ep, cluster, cmd_num, payloads)
+    return cluster
+
+def format_command(command):
+    command_map = { "ON_OFF_OFF_CMD":   ON_OFF_OFF_CMD, 
+                    "ON_OFF_ON_CMD":    ON_OFF_ON_CMD,
+                    "ON_OFF_TOGGLE_CMD":        ON_OFF_TOGGLE_CMD,
+                    "LVL_CTRL_MV_TO_LVL_CMD":   LVL_CTRL_MV_TO_LVL_CMD,
+                    "COLOR_CTRL_MV_TO_HUE_CMD":     COLOR_CTRL_MV_TO_HUE_CMD,
+                    "COLOR_CTRL_MV_TO_SAT_CMD":     COLOR_CTRL_MV_TO_SAT_CMD,
+                    "COLOR_CTRL_MV_TO_HUE_SAT_CMD": COLOR_CTRL_MV_TO_HUE_SAT_CMD }
+    cmdid = command_map[command]
+    return cmdid
 
 # TODO: generating random variable
 def format_payload(payload):
     if payload == "None":
-        return
+        return None
     types_map = {
         "TYPES.BOOL":   TYPES.BOOL,
         "TYPES.UINT8":  TYPES.UINT8,
@@ -290,9 +291,3 @@ if __name__ == "__main__":
             commander.start_routine()
         else:
             print("You must select either interactive mode or batch mode.")
-    # find_dongle_port()
-    # commander = CommandSet.make_instance(commander_file)
-    # commander.start_routine()
-    # ser = serial.Serial('COM13')
-    # ser.write(b'reset')
-    # ser.close()

@@ -5,7 +5,6 @@ import serial
 import logging
 import time
 from constants import *
-from connectionlogger import ConnectionLogger
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
 
@@ -19,12 +18,6 @@ def find_dongle_port():
         # find the appropriate port based on the name of the dongle
         # TODO: Implement automated port selector
         pass
-
-
-# Attribute issue
-# Attribute basically needs attribute id to specify which attribute to read
-# For example, if you want to know whether the light is on or off,
-# you must set the attribute id into ON_OFF_ONOFF_ATTR
 
 # representing command.json file, CommandSet defines:
 # - Device's information
@@ -68,6 +61,13 @@ class CommandSet:
             for i in range(iteration):
                 print("{}th iteration:".format(i))
                 for config in configlist:
+                    timestamp = time.strftime("%Y/%m/%d %H:%m:%S", time.localtime())
+                    mylogger.info("{}: Executing {} with payload {}".format(
+                        timestamp,
+                        config.command,
+                        config.payloads
+                        )
+                    )
                     self.do_individual_job(config)
             print("command routine finished")
 
@@ -91,10 +91,6 @@ class CommandSet:
             # case: command without payload
             # example: on & off
             if config.payloads == None:
-                print(type(self.addr))
-                print(type(self.ep))
-                print(type(config.cluster))
-                print(type(config.command))
                 cli_instance.zcl.generic(
                         eui64= self.addr, 
                         ep = self.ep,
@@ -114,17 +110,29 @@ class CommandSet:
             time.sleep(int(config.duration))
             # TODO: implement logging part
             # when reading attribute, you need to set which attribute to read.
-            # cli_instance.zcl.readattr(
-            #         eui64= attribute.eui64, 
-            #         level_attr,
-            #         ep=ULTRA_THIN_WAFER_ENDPOINT)
-            # zigbee_logger = ConnectionLogger(1, command, retval)
-            # zigbee_logger.write_log()
+            attr_id, attr_type = get_attr_element(config.command)
+            attr = Attribute(config.cluster, attr_id, attr_type)
+            returned_attr = cli_instance.zcl.readattr(
+                                self.addr,
+                                attr,
+                                ep=ULTRA_THIN_WAFER_ENDPOINT)
+            mylogger.info("returned value: {}".format(returned_attr.value))
         elif config.connection == 'BLE':
             pass
         else:
             print("UNSUPPORTED TYPE OF CONNECTION.")
             exit(1)
+
+def get_attr_element(command):
+    attr_id = 0
+    attr_type = 0
+    if command == ON_OFF_OFF_CMD or command == ON_OFF_ON_CMD:
+        attr_id = ON_OFF_ONOFF_ATTR
+        attr_type = TYPES.BOOL
+    elif command == LVL_CTRL_MV_TO_LVL_CMD or command == LVL_CTRL_MV_TO_LVL_ONOFF_CMD:
+        attr_id = LVL_CTRL_CURR_LVL_ATTR
+        attr_type = TYPES.UINT8
+    return attr_id, attr_type
 
 # class representing config.json files
 # each config file's should be made by this inner class
@@ -206,7 +214,14 @@ def initialization():
 
 # main routine
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)    # for logging
+    # LOGGING CONFIGURATION
+    mylogger = logging.getLogger("my")
+    mylogger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler("mylog.log")
+    mylogger.addHandler(file_handler)
+
+    # logging.basicConfig(level=logging.DEBUG)    # for logging
+    
     if len(sys.argv) == 1:
         print("You must select either interactive mode or batch mode.")
         print("Usage: python3 main.py <-I or -B> <if -B: filename>")
@@ -291,3 +306,4 @@ if __name__ == "__main__":
             commander.start_routine()
         else:
             print("You must select either interactive mode or batch mode.")
+            print("Usage: python3 main.py <-I or -B> <if -B: filename>")

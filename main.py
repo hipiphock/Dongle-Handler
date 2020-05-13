@@ -59,16 +59,8 @@ class CommandSet:
             configlist  = command['config']
             iteration   = command['iteration']
             for i in range(iteration):
-                print("{}th iteration:".format(i))
+                print("{}th iteration:".format(i+1))
                 for config in configlist:
-                    timestamp = time.strftime("%Y/%m/%d %H:%m:%S", time.localtime())
-                    mylogger.info("{}: Executing {} with payload {}".format(
-                        timestamp,
-                        config.cmdname,
-                        config.payloads
-                        )
-                    )
-                    print(config.command)
                     self.do_individual_job(config)
             print("command routine finished")
 
@@ -88,32 +80,26 @@ class CommandSet:
                 except serial.serialutil.SerialException:
                     cli_instance.close_cli()
                     return None
+            timestamp = time.strftime("Time: %Y/%m/%d %H:%m:%S", time.localtime())
+            mylogger.info("{}: Executing {} with payload {}".format(
+                timestamp, config.cmdname, config.payloads))
             # case: command without payload
             # example: on & off
             if config.payloads == None:
-                cli_instance.zcl.generic(
-                        eui64= self.addr, 
-                        ep = self.ep,
+                cli_instance.zcl.generic(eui64= self.addr, ep = self.ep,
                         profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                        cluster=config.cluster, 
-                        cmd_id=config.command)
+                        cluster=config.cluster, cmd_id=config.command)
             # case: command that needs payload
             # example: level control & color control
             else:
-                cli_instance.zcl.generic(
-                        eui64= self.addr,
-                        ep = self.ep, 
+                cli_instance.zcl.generic(eui64= self.addr, ep = self.ep,
                         profile=DEFAULT_ZIGBEE_PROFILE_ID, 
-                        cluster=config.cluster, 
-                        cmd_id=config.command, 
-                        payload=config.payloads)
+                        cluster=config.cluster, cmd_id=config.command, payload=config.payloads)
             time.sleep(float(config.duration))
             # when reading attribute, you need to set which attribute to read.
             attr_id, attr_type = get_attr_element(config.command)
             attr = Attribute(config.cluster, attr_id, attr_type)
-            returned_attr = cli_instance.zcl.readattr(
-                                self.addr,
-                                attr,
+            returned_attr = cli_instance.zcl.readattr(self.addr, attr,
                                 ep=ULTRA_THIN_WAFER_ENDPOINT)
             mylogger.info("returned value: {}".format(returned_attr.value))
         elif config.connection == 'BLE':
@@ -140,7 +126,7 @@ class Config:
         self.connection = connection
         self.cluster = cluster
         self.command = command
-        self.cmdname = cmdname
+        self.cmdname = cmdname          # necessary for logging
         self.payloads = payloads
         self.duration = duration
     
@@ -214,10 +200,11 @@ def initialization():
 # main routine
 if __name__ == "__main__":
     # LOGGING CONFIGURATION
-    mylogger = logging.getLogger("my")
+    mylogger = logging.getLogger("ZB")
     mylogger.setLevel(logging.INFO)
     file_handler = logging.FileHandler("mylog.log")
     mylogger.addHandler(file_handler)
+    mylogger.info("PROGRAM START")
 
     # logging.basicConfig(level=logging.DEBUG)    # for logging
     

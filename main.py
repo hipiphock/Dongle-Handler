@@ -64,10 +64,11 @@ class CommandSet:
                     timestamp = time.strftime("%Y/%m/%d %H:%m:%S", time.localtime())
                     mylogger.info("{}: Executing {} with payload {}".format(
                         timestamp,
-                        config.command,
+                        config.cmdname,
                         config.payloads
                         )
                     )
+                    print(config.command)
                     self.do_individual_job(config)
             print("command routine finished")
 
@@ -87,7 +88,6 @@ class CommandSet:
                 except serial.serialutil.SerialException:
                     cli_instance.close_cli()
                     return None
-            # attribute = make_attr(self.addr, self.ep, config.command, config.payloads)
             # case: command without payload
             # example: on & off
             if config.payloads == None:
@@ -107,8 +107,7 @@ class CommandSet:
                         cluster=config.cluster, 
                         cmd_id=config.command, 
                         payload=config.payloads)
-            time.sleep(int(config.duration))
-            # TODO: implement logging part
+            time.sleep(float(config.duration))
             # when reading attribute, you need to set which attribute to read.
             attr_id, attr_type = get_attr_element(config.command)
             attr = Attribute(config.cluster, attr_id, attr_type)
@@ -137,10 +136,11 @@ def get_attr_element(command):
 # class representing config.json files
 # each config file's should be made by this inner class
 class Config:
-    def __init__(self, connection, cluster, command, payloads=None, duration=0):
+    def __init__(self, connection, cluster, command, cmdname, payloads=None, duration=0):
         self.connection = connection
         self.cluster = cluster
         self.command = command
+        self.cmdname = cmdname
         self.payloads = payloads
         self.duration = duration
     
@@ -149,13 +149,13 @@ class Config:
         with open(configfile) as config_file:
             content = json.load(config_file)
             connection  = content['connection']
-            _command    = content['command']
+            cmdname     = content['command']
             payload     = content['payloads']
             duration    = content['duration']
-            cluster     = get_cluster(_command)
-            command     = format_command(_command)
+            cluster     = get_cluster(cmdname)
+            command     = format_command(cmdname)
             payloads    = format_payload(payload)
-        return cls(connection, cluster, command, payloads, duration)
+        return cls(connection, cluster, command, cmdname, payloads, duration)
 
 def get_cluster(command):
     cluster = 0
@@ -198,7 +198,6 @@ def format_payload(payload):
     result = []
     for item in payload:
         value_type = types_map[item['type']]
-
         if value_type is not TYPES.STRING:
             value = int(item['value'], 16)
         else:
@@ -234,11 +233,9 @@ if __name__ == "__main__":
             # cli_instance.bdb.role = 'zr'
             # cli_instance.bdb.start()
             # rough coding: turning light on and off
-            eui64 = int('88571DFFFE0E5416', 16)
-            off_attr    = Attribute(ON_OFF_CLUSTER, ON_OFF_ONOFF_ATTR,
-                                    TYPES.BOOL, ON_OFF_OFF_CMD)
-            on_attr     = Attribute(ON_OFF_CLUSTER, ON_OFF_ONOFF_ATTR,
-                                    TYPES.BOOL, ON_OFF_ON_CMD)
+            eui64 = int('FFFE88571D018E53', 16)
+            on_off_attr    = Attribute(ON_OFF_CLUSTER, ON_OFF_ONOFF_ATTR,
+                                    TYPES.BOOL)
             level_attr  = Attribute(LVL_CTRL_CLUSTER, LVL_CTRL_CURR_LVL_ATTR,
                                     TYPES.UINT8)
             while True:
@@ -249,13 +246,13 @@ if __name__ == "__main__":
                     print("turning off the light")
                     cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, 
                             DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_OFF_CMD)
-                    cli_instance.zcl.readattr(eui64, off_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    cli_instance.zcl.readattr(eui64, on_off_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # on command
                 elif usr_cmd == 'on':
                     print("turning on the light")
                     cli_instance.zcl.generic(eui64, 8, ON_OFF_CLUSTER, 
                             DEFAULT_ZIGBEE_PROFILE_ID, ON_OFF_ON_CMD)
-                    cli_instance.zcl.readattr(eui64, on_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    cli_instance.zcl.readattr(eui64, on_off_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 # set light level into 'low'
                 elif usr_cmd == 'low':
                     low_payload = [(2, TYPES.UINT8), (0, TYPES.UINT16)]
@@ -293,6 +290,11 @@ if __name__ == "__main__":
                             DEFAULT_ZIGBEE_PROFILE_ID, 
                             LVL_CTRL_MV_TO_LVL_ONOFF_CMD, payload=custom_payload)
                     cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                # get status
+                elif usr_cmd == 'read':
+                    onoff_result = cli_instance.zcl.readattr(eui64, on_off_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    level_result = cli_instance.zcl.readattr(eui64, level_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    print(level_result)
                 # terminate the program
                 elif usr_cmd == 'exit' or usr_cmd == 'quit' or usr_cmd == 'q':
                     print("exit")

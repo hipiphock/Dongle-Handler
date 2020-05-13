@@ -8,7 +8,7 @@
             "command": ["./config/Zigbee/On_Off_on.json",
                         "./config/Zigbee/On_Off_off.json"
             ],
-            "iteration": 20
+            "iteration": 3
         }
     ]
 }

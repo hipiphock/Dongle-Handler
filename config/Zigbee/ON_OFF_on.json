@@ -2,5 +2,5 @@
     "connection":   "Zigbee",
     "command":      "ON_OFF_ON_CMD",
     "payloads":     "None",
-    "duration":     "1"
+    "duration":     "0.5"
 }

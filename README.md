@@ -13,10 +13,7 @@ pip3 install blatann
 ```
 
 # Execution
-To execute,
-``` shell
-$ python3 test.py
-```
+## Batch Mode
 To execute the program in batch mode, you need **command.json** file and a set of **./config/<CONNECTION_TYPE>/<COMMAND>.json** files.
 
 The **command.json** file consists like this kind of form:
@@ -63,6 +60,16 @@ Each config.json files specifies the type of connection they are willing to conn
 통신을 하려는 device의 정보(이름과 uuid)와 통신하는 방식을 정의한 후, 원하는 service와 해당 service의 characteristic 중 하나에 대해서 대해서 상세하게 서술한다.
 
 해당 characteristic의 type이 read인지, write인지, notify인지에 따라서 value를 보낼 것인지 받을 것인지가 달라진다.
+
+## Interactive Mode
+현재의 프로그램은 다음 명령어를 가지고 있다.
+ * on
+ * off
+ * low
+ * mid
+ * high
+ * quit
+직접 쳐보면서 이게 무슨 명령어인지 파악해보자 :)
 
 # Hardware Requirements
 This program is made for nRF52840 dongle from Nordic Semiconductor.

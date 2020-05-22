@@ -11,3 +11,38 @@ Time: 2020/05/13 18:05:08: Executing ON_OFF_ON_CMD with payload None
 returned value: True
 Time: 2020/05/13 18:05:08: Executing ON_OFF_OFF_CMD with payload None
 returned value: False
+PROGRAM START
+Time: 2020/05/15 10:05:36: Executing ON_OFF_ON_CMD with payload None
+returned value: True
+Time: 2020/05/15 10:05:37: Executing ON_OFF_OFF_CMD with payload None
+returned value: False
+Time: 2020/05/15 10:05:37: Executing ON_OFF_ON_CMD with payload None
+returned value: True
+Time: 2020/05/15 10:05:38: Executing ON_OFF_OFF_CMD with payload None
+returned value: False
+Time: 2020/05/15 10:05:39: Executing ON_OFF_ON_CMD with payload None
+returned value: True
+Time: 2020/05/15 10:05:39: Executing ON_OFF_OFF_CMD with payload None
+returned value: False
+PROGRAM START
+PROGRAM START
+Time: 2020/05/18 10:05:29: Executing ON_OFF_ON_CMD with payload None
+returned value: True
+Time: 2020/05/18 10:05:30: Executing ON_OFF_OFF_CMD with payload None
+returned value: False
+Time: 2020/05/18 10:05:30: Executing ON_OFF_ON_CMD with payload None
+returned value: True
+Time: 2020/05/18 10:05:31: Executing ON_OFF_OFF_CMD with payload None
+returned value: False
+Time: 2020/05/18 10:05:32: Executing ON_OFF_ON_CMD with payload None
+returned value: True
+Time: 2020/05/18 10:05:32: Executing ON_OFF_OFF_CMD with payload None
+returned value: False
+PROGRAM START
+PROGRAM START
+PROGRAM START
+PROGRAM START
+PROGRAM START
+PROGRAM START
+PROGRAM START
+PROGRAM START

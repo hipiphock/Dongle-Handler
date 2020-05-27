@@ -1,6 +1,6 @@
 import json
 
-# cmd_list: what kind of list should we take?
+# cmd_list:
 # [
 #   [[cmd1, cmd2, cmd3], iter1],
 #   [[cmd1, cmd2, cmd3], iter2],

@@ -69,12 +69,12 @@ Each config.json files specifies the type of connection they are willing to conn
  * mid
  * high
  * quit
+
 직접 쳐보면서 이게 무슨 명령어인지 파악해보자 :)
 
 # Hardware Requirements
 This program is made for nRF52840 dongle from Nordic Semiconductor.
-Not only you need this dongle for execution, but also you must write the following hex file to your dongle:
-[link](https://github.com)
+Not only you need this dongle for execution, but also you must write the following hex file to your dongle.
 When setthing the serial connection with dongle and PC:
  * 115200 bit/s,
  * 8-bit-long word,

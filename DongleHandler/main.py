@@ -216,9 +216,9 @@ if __name__ == "__main__":
         if sys.argv[1] == '-I':
             print("INTERACTIVE MODE")
             cli_instance = ZbCliDevice('','','COM13')
-            cli_instance.bdb.channel = [24]
-            cli_instance.bdb.role = 'zr'
-            cli_instance.bdb.start()
+            # cli_instance.bdb.channel = [24]
+            # cli_instance.bdb.role = 'zr'
+            # cli_instance.bdb.start()
             # rough coding: turning light on and off
             eui64 = int('FFFE88571D018E53', 16)
             on_off_attr    = Attribute(ON_OFF_CLUSTER, ON_OFF_ONOFF_ATTR,

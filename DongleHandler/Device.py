@@ -5,3 +5,7 @@ class Device:
         self.uuid = uuid
         self.addr = addr
         self.ep   = ep
+
+    @classmethod
+    def make_instance(cls, device_file):
+        pass

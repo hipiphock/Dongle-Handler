@@ -56,7 +56,7 @@ ZCL_VERSION_ATTR              = 0x0000
 IDENTIFY_IDENTIFY_TIME_ATTR   = 0x0000
 ON_OFF_ONOFF_ATTR             = 0x0000
 LVL_CTRL_CURR_LVL_ATTR        = 0x0000
-LVL_CTRL_ON_LEVEL_ATTR        = 0X0011      # added by @hingook
+LVL_CTRL_ON_LEVEL_ATTR        = 0X0011      # added by @hipiphock
 DOOR_LOCK_LOCK_STATE          = 0x0000
 COLOR_CTRL_CURR_HUE_ATTR      = 0x0000
 COLOR_CTRL_CURR_SAT_ATTR      = 0x0001
@@ -70,9 +70,9 @@ IDENTIFY_UPDATE_COMMISSION_STATE_CMD = 0x03
 
 ON_OFF_OFF_CMD                    = 0x00
 ON_OFF_ON_CMD                     = 0x01
-ON_OFF_TOGGLE_CMD                 = 0X02    # added by @hingook
+ON_OFF_TOGGLE_CMD                 = 0X02    # added by @hipiphock
 LVL_CTRL_MV_TO_LVL_CMD            = 0x00
-LVL_CTRL_MV_TO_LVL_ONOFF_CMD      = 0x04    # added by @hingook
+LVL_CTRL_MV_TO_LVL_ONOFF_CMD      = 0x04    # added by @hipiphock
 DOOR_LOCK_LOCK_DOOR_CMD           = 0x00
 DOOR_LOCK_UNLOCK_DOOR_CMD         = 0x01
 COLOR_CTRL_MV_TO_HUE_CMD          = 0x00
@@ -127,7 +127,12 @@ LIGHT_SWITCH_ENDPOINT        = 1     # Default Light Switch endpoint
 THINGY_PROXY_THINGY_ENDPOINT = 10    # One of the endpoints of Thingy on the Thingy Proxy
 OTA_CLIENT_ENDPOINT          = 10    # Default OTA Client endpoint
 
-ULTRA_THIN_WAFER_ENDPOINT    = 8     # Ultra Thin Wafer Endpoint, added by @hingook
+ULTRA_THIN_WAFER_ENDPOINT    = 8     # Ultra Thin Wafer Endpoint, added by @hipiphock
 
 DOOR_LOCK_OPEN  = 1
 DOOR_LOCK_CLOSE = 0
+
+##### Additional Declaration #####
+# added by @hipiphock
+ZIGBEE_CONNECTION           = 0
+BLE_CONNECTION              = 1

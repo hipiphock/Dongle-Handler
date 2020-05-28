@@ -1,6 +1,7 @@
 # main controller of Dongle Handler
 from DongleHandler import *
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
+import time
 
 # Work Routine for
 class TaskRoutine:
@@ -14,9 +15,9 @@ class TaskRoutine:
         # each task routine starts with connection
         # TODO: implement automated port selector
         cli_instance = ZbCliDevice('', '', 'COM13')
-        cli_instance.bdb.channel = [24]
-        cli_instance.bdb.role = 'zr'
-        cli_instance.bdb.start()
+        # cli_instance.bdb.channel = [24]
+        # cli_instance.bdb.role = 'zr'
+        # cli_instance.bdb.start()
         # TODO: implement automated method that does not
         # require SmartThings' permission.
 
@@ -37,6 +38,7 @@ class TaskRoutine:
                     cluster=task.cluster,
                     cmd_id=task.command,
                     payload=task.payloads)
+            time.sleep(0.5)
 
         # each task routine ends with disconnection
         

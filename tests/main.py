@@ -4,7 +4,12 @@ import random
 import serial
 import logging
 import time
-from Constants import *
+
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from DongleHandler import *
+
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
 

@@ -3,10 +3,13 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DongleHandler import *
 import logging
+import pyshark
 
 # This is basic test on Ultra Thin Wafer by Samsung Electronics.
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)    # for logging
+
+    # for logging
+    logging.basicConfig(level=logging.DEBUG)
 
     # Device Initialization
     ultra_thin_wafer = Device("Ultra Thin Wafer", 0x8e89bed6, 0xFFFE88571D018E53, 8)

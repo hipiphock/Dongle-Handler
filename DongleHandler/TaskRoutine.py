@@ -2,7 +2,7 @@
 from DongleHandler import *
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 import time
-import serial
+import json
 
 # Work Routine for
 class TaskRoutine:
@@ -21,10 +21,23 @@ class TaskRoutine:
         # Before connecting the device with the dongle,
         # the dongle must join the hub's network.
         # TODO: implement automated port selector
-        cli_instance = ZbCliDevice('', '', 'COM13')
-        cli_instance.bdb.channel = [24]
-        cli_instance.bdb.role = 'zr'
-        cli_instance.bdb.start()
+        with open('DongleHandler\\..\\resource\\dongle_status.json', "r") as dongle_file:
+            dongle_config = json.load(dongle_file)
+            port = dongle_config['port']
+            status = dongle_config['status']
+            dongle_file.close()
+        time.sleep(3)
+        cli_instance = ZbCliDevice('', '', port)
+        if status == 0:
+            cli_instance.bdb.channel = [24]
+            cli_instance.bdb.role = 'zr'
+            cli_instance.bdb.start()
+            with open('DongleHandler\\..\\resource\\dongle_status.json', "w") as dongle_file:
+                dongle_config['status'] = 1
+                json.dump(dongle_config, dongle_file)
+                dongle_file.close()
+
+
         print("The dongle has started commissioning.")
         print("Please search for the dongle via SmartThings App within 5 seconds.")
         time.sleep(5.0)
@@ -52,12 +65,13 @@ class TaskRoutine:
                     payload=task.payloads)
             time.sleep(0.5)
 
-        # each task routine ends with disconnection
-        cli_instance.close_cli()
-        port = serial.Serial("COM13", 115200)
-        port.write(str.encode('reset'))
-        port.writechar(' ')
-        port.reset_input_buffer()
-        port.reset_output_buffer()
-        port.close()
-        # Problem: 
+        # # each task routine ends with disconnection
+        # cli_instance.close_cli()
+        # port = serial.Serial("COM13", 115200)
+        # port.close()
+        # port.open()
+        # port.write(str.encode('reset'))
+        # port.reset_input_buffer()
+        # port.reset_output_buffer()
+        # port.close()
+        # # Problem:

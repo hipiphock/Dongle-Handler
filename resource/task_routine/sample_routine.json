@@ -1,0 +1,12 @@
+{
+    "task_list" :   [
+        "on",
+        "off",
+        "level_10",
+        "level_50",
+        "level_100",
+        "color_cw",
+        "color_ww"
+    ],
+    "iteration" :   3
+}

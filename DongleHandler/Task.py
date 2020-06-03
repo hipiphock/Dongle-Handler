@@ -10,8 +10,7 @@ class Task:
         self.duration = duration
 
     @classmethod
-    def generate_regular_random_task(cls, cluster, command):
-
+    def generate_regular_random_task(cls, cluster, command, duration):
         if cluster == ON_OFF_CLUSTER:
             command = random.randint(0x00, 0x01)
             payloads = None
@@ -26,10 +25,10 @@ class Task:
             randval1 = random.randint(0x00, 0xfe)
             randval2 = random.randint(0x0001, 0xfeff)
             payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
-        return cls(cluster, command, payloads, 0.0)
+        return cls(cluster, command, payloads, duration)
 
     @classmethod
-    def generate_irregular_random_task(cls, cluster, command):
+    def generate_irregular_random_task(cls, cluster, command, duration):
         if cluster == ON_OFF_CLUSTER:
             command = random.randint(0x00, 0x01)
             payloads = None
@@ -43,4 +42,4 @@ class Task:
             randval1 = random.randint(0x0000, 0xfeff) + 0xff00
             randval2 = random.randint(0x0001, 0xffff) + 0xffff
             payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
-        return cls(cluster, command, payloads, 0.0)
+        return cls(cluster, command, payloads, duration)

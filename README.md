@@ -1,19 +1,36 @@
 # Dongle handler
 **nRF52840 dongle handler with BLE, Zigbee command functions**
 
-The dongle handler is a python program that sends and receives BLE/Zigbee messages to some appropriate devices.
+The dongle handler is a python program that sends and receives BLE/Zigbee messages to devices that supports BLE/Zigbee connection.
 
 It supports both batch mode and interactive mode.
+
+# Design
+The program can do three things:
+ * It can register & remove devices.
+ * It can make & delete command tasks.
+ * It can make task routines based on pre-defined devices & tasks.
+
+The three of those properties are registerd via json files in /resource directory.
 
 # Build
 So far, there is no need to build the program. You just need prerequistic libraries.
 ``` shell
 pip3 install zb-cli-wrapper
-pip3 install blatann
 ```
+## Device registration
+The device property consists of:
+ * name
+ * uuid (this is needed for BLE connection)
+ * address (this is the eui64 address for ZigBee commission)
+ * endpoint (another element for ZigBee commission)
+
+## Task registration
+
+## Making task routine
+
 
 # Execution
-## Batch Mode
 To execute the program in batch mode, you need **command.json** file and a set of **./config/<CONNECTION_TYPE>/<COMMAND>.json** files.
 
 The **command.json** file consists like this kind of form:

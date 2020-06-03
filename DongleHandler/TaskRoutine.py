@@ -47,7 +47,7 @@ class TaskRoutine:
         mylogger = logging.getLogger("ZB")
         mylogger.setLevel(logging.INFO)
         timestring = time.strftime("%Y.%m.%d.%H.%M.%S", time.gmtime())
-        log_name = timestring + ".log"
+        log_name = "DongleHandler\\..\\logs\\" + timestring + ".log"
         file_handler = logging.FileHandler(log_name)
         mylogger.addHandler(file_handler)
         mylogger.info("PROGRAM START")

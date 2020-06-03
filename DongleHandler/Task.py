@@ -14,7 +14,6 @@ class Task:
         if cluster == ON_OFF_CLUSTER:
             command = random.randint(0x00, 0x01)
             payloads = None
-            randval2 = 0.5
         elif cluster == LVL_CTRL_CLUSTER:
             command = LVL_CTRL_MV_TO_LVL_ONOFF_CMD
             randval1 = random.randint(0x00, 0xfe)
@@ -23,7 +22,7 @@ class Task:
             payloads = [(randval1, TYPES.UINT8), (randval2, TYPES.UINT16)]
         elif cluster == COLOR_CTRL_CLUSTER:
             command = COLOR_CTRL_MV_TO_TEMPERATURE_CMD
-            randval1 = random.randint(0x00, 0xfe)
+            randval1 = random.randint(200, 370)
             # randval2 = random.randint(0x0001, 0xfeff)
             randval2 = 0
             payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]

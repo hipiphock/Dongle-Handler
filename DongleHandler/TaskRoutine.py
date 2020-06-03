@@ -114,7 +114,7 @@ class ZigbeeLogger:
         file_handler = logging.FileHandler(log_name)
         mylogger.addHandler(file_handler)
         mylogger.info("PROGRAM START")
-        mylogger.info("Time\tCLuster\tCommand\tpayload\tinterval\treturn value")
+        mylogger.info("Time\t\tCLuster\t\tCommand\t\tpayload\t\tinterval\t\treturn value")
 
     def get_log(self, cluster, command, payload, interval, ret_val):
         if cluster == ON_OFF_CLUSTER:

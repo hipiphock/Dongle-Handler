@@ -31,7 +31,7 @@ if __name__ == "__main__":
     task_list.append(sw_light_task)
     task_list.append(dl_light_task)
 
-    simple_routine = TaskRoutine(ultra_thin_wafer, ZIGBEE_CONNECTION, task_list, 1)
+    simple_routine = TaskRoutine(ultra_thin_wafer, ZIGBEE_CONNECTION, task_list, 3)
 
     # start routine
     simple_routine.start_routine()

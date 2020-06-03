@@ -35,6 +35,7 @@ def parse_json_device(file_name):
 def parse_json_task_routine(file_name):
     with open(file_name) as task_routine_file:
         content = json.load(task_routine_file)
+        device      = content['device']
         task_list   = content['task_list']
         iteration   = content['iteration']
         return task_list, iteration

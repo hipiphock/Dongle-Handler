@@ -1,6 +1,0 @@
-{
-    "connection":   "Zigbee",
-    "command":      "ON_OFF_ON_CMD",
-    "payloads":     "None",
-    "duration":     "0.5"
-}

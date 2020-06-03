@@ -1,11 +1,5 @@
 import json
 
-# cmd_list:
-# [
-#   [[cmd1, cmd2, cmd3], iter1],
-#   [[cmd1, cmd2, cmd3], iter2],
-#   [[cmd1, cmd2, cmd3], iter3],
-# ]
 def make_json_command(file_name, device_name, device_uuid, device_addr, device_ep, cmd_list):
     data = {}
     data['Device']      = device_name

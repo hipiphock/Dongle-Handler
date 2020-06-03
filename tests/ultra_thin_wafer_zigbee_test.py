@@ -12,12 +12,15 @@ if __name__ == "__main__":
     ultra_thin_wafer = Device("Ultra Thin Wafer", 0x8e89bed6, 0xFFFE88571D018E53, 8)
 
     # Making Task & TaskRoutine
-    off_task    = Task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, None)
-    on_task     = Task(ON_OFF_CLUSTER, ON_OFF_ON_CMD, None)
+    off_task    = Task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, None, 0.5)
+    on_task     = Task(ON_OFF_CLUSTER, ON_OFF_ON_CMD, None, 0.5)
 
     low_task    = Task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, [(0x02, TYPES.UINT8), (0x05, TYPES.UINT16)], 0.5)
     mid_task    = Task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, [(0x50, TYPES.UINT8), (0x05, TYPES.UINT16)], 0.5)
     high_task   = Task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, [(0xFD, TYPES.UINT8), (0x05, TYPES.UINT16)], 0.5)
+
+    sw_light_task = Task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, [(370, TYPES.UINT16), (0x05, TYPES.UINT16)], 0.5)
+    dl_light_task = Task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, [(200, TYPES.UINT16), (0x05, TYPES.UINT16)], 0.5)
 
     task_list = []
     task_list.append(off_task)
@@ -25,6 +28,8 @@ if __name__ == "__main__":
     task_list.append(high_task)
     task_list.append(mid_task)
     task_list.append(low_task)
+    task_list.append(sw_light_task)
+    task_list.append(dl_light_task)
 
     simple_routine = TaskRoutine(ultra_thin_wafer, ZIGBEE_CONNECTION, task_list, 3)
 

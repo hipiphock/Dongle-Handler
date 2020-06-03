@@ -36,34 +36,33 @@ class TaskRoutine:
                 dongle_config['status'] = 1
                 json.dump(dongle_config, dongle_file)
                 dongle_file.close()
-
-
-        print("The dongle has started commissioning.")
-        print("Please search for the dongle via SmartThings App within 5 seconds.")
-        time.sleep(5.0)
+            print("The dongle has started commissioning.")
+            print("Please search for the dongle via SmartThings App within 5 seconds.")
+            time.sleep(5.0)
 
         # 1. Start connection with the device.
         # The connection of the device is ruled by SmartThings hub.
         # Therefore, the only job the dongle needs to do is 
 
         # do the task_list
-        for task in self.task_list:
-            if task.payloads == None:
-                cli_instance.zcl.generic(
-                    eui64=self.device.addr,
-                    ep=self.device.ep,
-                    profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                    cluster=task.cluster,
-                    cmd_id=task.command)
-            else:
-                cli_instance.zcl.generic(
-                    eui64=self.device.addr,
-                    ep=self.device.ep,
-                    profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                    cluster=task.cluster,
-                    cmd_id=task.command,
-                    payload=task.payloads)
-            time.sleep(0.5)
+        for i in range(self.iteration):
+            for task in self.task_list:
+                if task.payloads == None:
+                    cli_instance.zcl.generic(
+                        eui64=self.device.addr,
+                        ep=self.device.ep,
+                        profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                        cluster=task.cluster,
+                        cmd_id=task.command)
+                else:
+                    cli_instance.zcl.generic(
+                        eui64=self.device.addr,
+                        ep=self.device.ep,
+                        profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                        cluster=task.cluster,
+                        cmd_id=task.command,
+                        payload=task.payloads)
+                time.sleep(task.duration)
 
         # # each task routine ends with disconnection
         # cli_instance.close_cli()

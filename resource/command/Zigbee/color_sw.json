@@ -1,6 +1,6 @@
 {
     "cluster":      "0x0300",
     "command":      "0x0a",
-    "payloads":     [370, 0.0],
-    "duration":     "0.0"
+    "payloads":     [[370, "0x21"], [0, "0x21"]],
+    "duration":     0.0
 }

@@ -2,5 +2,5 @@
     "cluster":      "0x0006",
     "command":      "0x00",
     "payloads":     "None",
-    "duration":     "0.5"
+    "duration":     0.5
 }

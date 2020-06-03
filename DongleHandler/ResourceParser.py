@@ -26,8 +26,8 @@ def parse_json_device(file_name):
     with open(file_name) as device_file:
         content = json.load(device_file)
         name    = content['name']
-        uuid    = content['uuid']
-        eui64   = content['eui64']
+        uuid    = int(content['uuid'], 16)
+        eui64   = int(content['eui64'], 16)
         ep      = content['ep']
         return Device(name, uuid, eui64, ep)
 
@@ -35,17 +35,29 @@ def parse_json_device(file_name):
 def parse_json_task_routine(file_name):
     with open(file_name) as task_routine_file:
         content = json.load(task_routine_file)
-        device      = content['device']
-        task_list   = content['task_list']
+        _device     = content['device']
+        connection  = content['connection']
+        _task_list  = content['task_list']
         iteration   = content['iteration']
-        return task_list, iteration
+        device = parse_json_device(_device)
+        task_list = []
+        for _task in _task_list:
+            task = parse_json_command(_task)
+            task_list.append(task)
+        return TaskRoutine(device, connection, task_list, iteration)
 
 # parsing command file
+# TODO: deal with payloads
 def parse_json_command(file_name):
     with open(file_name) as command_file:
         content = json.load(command_file)
-        cluster    = content['cluster']
-        command    = content['command']
-        payloads   = content['payloads']
+        cluster    = int(content['cluster'], 16)
+        command    = int(content['command'], 16)
+        _payloads  = content['payloads']
+        if _payloads == "None":
+            payloads = None
+        else:
+            print(_payloads)
+            payloads   = [(_payloads[0][0], int(_payloads[0][1], 16)), (_payloads[1][0], int(_payloads[1][1], 16))]
         duration   = content['duration']
         return Task(cluster, command, payloads, duration)

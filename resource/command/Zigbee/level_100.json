@@ -2,5 +2,5 @@
     "cluster":      "0x0008",
     "command":      "0x04",
     "payloads":     [[254, "0x20"], [0, "0x21"]],
-    "duration":     0.0
+    "duration":     0.5
 }

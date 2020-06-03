@@ -7,8 +7,8 @@
         "DongleHandler\\..\\resource\\command\\Zigbee\\level_100.json",
         "DongleHandler\\..\\resource\\command\\Zigbee\\level_50.json",
         "DongleHandler\\..\\resource\\command\\Zigbee\\level_10.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\color_cw.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\color_ww.json"
+        "DongleHandler\\..\\resource\\command\\Zigbee\\color_dl.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\color_sw.json"
     ],
     "iteration" :   3
 }

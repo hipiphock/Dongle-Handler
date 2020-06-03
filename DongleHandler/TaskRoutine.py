@@ -1,8 +1,11 @@
 # main controller of Dongle Handler
-from DongleHandler import *
-from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 import time
 import json
+
+from DongleHandler import *
+from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
+from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
+
 
 # Work Routine for
 class TaskRoutine:
@@ -62,6 +65,10 @@ class TaskRoutine:
                         cluster=task.cluster,
                         cmd_id=task.command,
                         payload=task.payloads)
+                attr_id, attr_type = get_attr_element(task.cluster, task.command)
+                attr = Attribute(task.cluster, attr_id, attr_type)
+                returned_attr = cli_instance.zcl.readattr(self.device.addr, attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+
                 time.sleep(task.duration)
 
         # # each task routine ends with disconnection
@@ -74,3 +81,17 @@ class TaskRoutine:
         # port.reset_output_buffer()
         # port.close()
         # # Problem:
+
+def get_attr_element(cluster, command):
+    attr_id = 0
+    attr_type = 0
+    if cluster == 6:
+        attr_id = ON_OFF_ONOFF_ATTR
+        attr_type = TYPES.BOOL
+    elif cluster == 8:
+        attr_id = LVL_CTRL_CURR_LVL_ATTR
+        attr_type = TYPES.UINT8
+    elif cluster == 0x0300:
+        attr_id = COLOR_CTRL_TEMP_MIRED_ATTR
+        attr_type = TYPES.UINT16
+    return attr_id, attr_type

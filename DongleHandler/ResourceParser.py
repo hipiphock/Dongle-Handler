@@ -57,7 +57,6 @@ def parse_json_command(file_name):
         if _payloads == "None":
             payloads = None
         else:
-            print(_payloads)
             payloads   = [(_payloads[0][0], int(_payloads[0][1], 16)), (_payloads[1][0], int(_payloads[1][1], 16))]
         duration   = content['duration']
         return Task(cluster, command, payloads, duration)

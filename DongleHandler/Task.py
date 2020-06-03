@@ -26,7 +26,7 @@ class Task:
             randval1 = random.randint(0x00, 0xfe)
             randval2 = random.randint(0x0001, 0xfeff)
             payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
-        return cls(cluster, command, payloads, 0.5)
+        return cls(cluster, command, payloads, 0.0)
 
     @classmethod
     def generate_irregular_random_task(cls, cluster, command):
@@ -43,4 +43,4 @@ class Task:
             randval1 = random.randint(0x0000, 0xfeff) + 0xff00
             randval2 = random.randint(0x0001, 0xffff) + 0xffff
             payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
-        return cls(cluster, command, payloads, 0.5)
+        return cls(cluster, command, payloads, 0.0)

@@ -1,5 +1,7 @@
 import json
+from DongleHandler import *
 
+# generating device file
 def make_json_device(file_name, device_name, device_uuid, device_eui64, device_ep):
     data = {}
     data['name']        = device_name
@@ -9,21 +11,7 @@ def make_json_device(file_name, device_name, device_uuid, device_eui64, device_e
     with open(file_name, 'w') as outfile:
         json.dump(data, outfile)
 
-def make_json_task_routine(file_name, task_list):
-    pass
-
-# def make_json_command(file_name, device_name, device_uuid, device_addr, device_ep, cmd_list):
-#     data = {}
-#     data['Device']      = device_name
-#     data['uuid']        = device_uuid
-#     data['address']     = device_addr
-#     data['ep']          = device_ep
-#     data['command_list']= []
-#     for cmd in cmd_list:
-#         data['command_list'].append(cmd)
-#     with open(file_name, 'w') as outfile:
-#         json.dump(data, outfile)
-
+# generating command file
 def make_json_command(file_name, cluster, command, payloads, duration):
     data = {}
     data['cluster']         = cluster
@@ -32,3 +20,31 @@ def make_json_command(file_name, cluster, command, payloads, duration):
     data['duration']        = duration
     with open(file_name, 'w') as outfile:
         json.dump(data, outfile)
+
+# parsing device file
+def parse_json_device(file_name):
+    with open(file_name) as device_file:
+        content = json.load(device_file)
+        name    = content['name']
+        uuid    = content['uuid']
+        eui64   = content['eui64']
+        ep      = content['ep']
+        return Device(name, uuid, eui64, ep)
+
+# parsing task routine file
+def parse_json_task_routine(file_name):
+    with open(file_name) as task_routine_file:
+        content = json.load(task_routine_file)
+        task_list   = content['task_list']
+        iteration   = content['iteration']
+        return task_list, iteration
+
+# parsing command file
+def parse_json_command(file_name):
+    with open(file_name) as command_file:
+        content = json.load(command_file)
+        cluster    = content['cluster']
+        command    = content['command']
+        payloads   = content['payloads']
+        duration   = content['duration']
+        return Task(cluster, command, payloads, duration)

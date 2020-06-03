@@ -1,6 +1,7 @@
 # main controller of Dongle Handler
 import time
 import json
+import logging
 
 from DongleHandler import *
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
@@ -43,6 +44,14 @@ class TaskRoutine:
             print("Please search for the dongle via SmartThings App within 5 seconds.")
             time.sleep(5.0)
 
+        mylogger = logging.getLogger("ZB")
+        mylogger.setLevel(logging.INFO)
+        timestring = time.strftime("%Y.%m.%d.%H.%M.%S", time.gmtime())
+        log_name = timestring + ".log"
+        file_handler = logging.FileHandler(log_name)
+        mylogger.addHandler(file_handler)
+        mylogger.info("PROGRAM START")
+
         # 1. Start connection with the device.
         # The connection of the device is ruled by SmartThings hub.
         # Therefore, the only job the dongle needs to do is 
@@ -50,6 +59,8 @@ class TaskRoutine:
         # do the task_list
         for i in range(self.iteration):
             for task in self.task_list:
+                timestamp = time.strftime("Time: %Y/%m/%d %H:%m:%S", time.localtime())
+                mylogger.info("{}: From cluster {} executing {} with payload {}".format(timestamp, task.cluster, task.command, task.payloads))
                 if task.payloads == None:
                     cli_instance.zcl.generic(
                         eui64=self.device.addr,
@@ -65,14 +76,14 @@ class TaskRoutine:
                         cluster=task.cluster,
                         cmd_id=task.command,
                         payload=task.payloads)
+                time.sleep(task.duration)
                 attr_id, attr_type = get_attr_element(task.cluster, task.command)
                 attr = Attribute(task.cluster, attr_id, attr_type)
                 returned_attr = cli_instance.zcl.readattr(self.device.addr, attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-
-                time.sleep(task.duration)
+                mylogger.info("returned value: {}".format(returned_attr.value))
 
         # # each task routine ends with disconnection
-        # cli_instance.close_cli()
+        cli_instance.close_cli()
         # port = serial.Serial("COM13", 115200)
         # port.close()
         # port.open()

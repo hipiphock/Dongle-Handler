@@ -14,32 +14,34 @@ if __name__ == "__main__":
     # simple_routine.start_routine()
 
     # generate regular random samples
+    TIME_INTERVAL = 0.0
+
     print("Random Regular")
     regular_random_task_list = []
     for i in range(10):
-        task = Task.generate_regular_random_task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, 0)
+        task = Task.generate_regular_random_task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, TIME_INTERVAL)
         regular_random_task_list.append(task)
     for i in range(10):
-        task = Task.generate_regular_random_task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, 0)
+        task = Task.generate_regular_random_task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, TIME_INTERVAL)
         regular_random_task_list.append(task)
     for i in range(10):
-        task = Task.generate_regular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, 0)
+        task = Task.generate_regular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, TIME_INTERVAL)
         regular_random_task_list.append(task)
     device = parse_json_device('DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json')
     regular_task_routine = TaskRoutine(device, 0, regular_random_task_list, 1)
     regular_task_routine.start_routine()
 
-    # generate irregular random samples
+    # # generate irregular random samples
     print("Random Irregular")
     irregular_random_task_list = []
     for i in range(10):
-        task = Task.generate_irregular_random_task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, 0)
+        task = Task.generate_irregular_random_task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, TIME_INTERVAL)
         irregular_random_task_list.append(task)
     for i in range(10):
-        task = Task.generate_irregular_random_task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, 0)
+        task = Task.generate_irregular_random_task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, TIME_INTERVAL)
         irregular_random_task_list.append(task)
     for i in range(10):
-        task = Task.generate_irregular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, 0)
+        task = Task.generate_irregular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, TIME_INTERVAL)
         irregular_random_task_list.append(task)
     irregular_task_routine = TaskRoutine(device, 0, irregular_random_task_list, 1)
     irregular_task_routine.start_routine()

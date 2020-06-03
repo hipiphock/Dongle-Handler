@@ -44,13 +44,8 @@ class TaskRoutine:
             print("Please search for the dongle via SmartThings App within 5 seconds.")
             time.sleep(5.0)
 
-        mylogger = logging.getLogger("ZB")
-        mylogger.setLevel(logging.INFO)
-        timestring = time.strftime("%Y.%m.%d.%H.%M.%S", time.gmtime())
-        log_name = "DongleHandler\\..\\logs\\" + timestring + ".log"
-        file_handler = logging.FileHandler(log_name)
-        mylogger.addHandler(file_handler)
-        mylogger.info("PROGRAM START")
+        zblogger = ZigbeeLogger()
+        zblogger.log_init()
 
         # 1. Start connection with the device.
         # The connection of the device is ruled by SmartThings hub.
@@ -59,8 +54,6 @@ class TaskRoutine:
         # do the task_list
         for i in range(self.iteration):
             for task in self.task_list:
-                timestamp = time.strftime("Time: %Y/%m/%d %H:%m:%S", time.localtime())
-                mylogger.info("{}: From cluster {} executing {} with payload {}".format(timestamp, task.cluster, task.command, task.payloads))
                 if task.payloads == None:
                     cli_instance.zcl.generic(
                         eui64=self.device.addr,
@@ -80,9 +73,11 @@ class TaskRoutine:
                 attr_id, attr_type = get_attr_element(task.cluster, task.command)
                 attr = Attribute(task.cluster, attr_id, attr_type)
                 returned_attr = cli_instance.zcl.readattr(self.device.addr, attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                mylogger.info("returned value: {}".format(returned_attr.value))
+                zblogger.get_log(task.cluster, task.command, task.payloads, task.duration, returned_attr.value)
+                
 
         # # each task routine ends with disconnection
+        zblogger.close_logfile()
         cli_instance.close_cli()
         # port = serial.Serial("COM13", 115200)
         # port.close()
@@ -106,3 +101,40 @@ def get_attr_element(cluster, command):
         attr_id = COLOR_CTRL_TEMP_MIRED_ATTR
         attr_type = TYPES.UINT16
     return attr_id, attr_type
+
+# Zigbee Logger
+mylogger = logging.getLogger("ZB")
+mylogger.setLevel(logging.INFO)
+
+class ZigbeeLogger:
+    def log_init(self):
+        timestring = time.strftime("%Y.%m.%d.%H.%M.%S.", time.gmtime())
+        miliseconds = str(int(round(time.time()*1000)))
+        log_name = "DongleHandler\\..\\logs\\" + timestring + miliseconds + ".log"
+        file_handler = logging.FileHandler(log_name)
+        mylogger.addHandler(file_handler)
+        mylogger.info("PROGRAM START")
+        mylogger.info("Time\tCLuster\tCommand\tpayload\tinterval\treturn value")
+
+    def get_log(self, cluster, command, payload, interval, ret_val):
+        if cluster == ON_OFF_CLUSTER:
+            cluster_string = "ON_OFF"
+            if command == ON_OFF_OFF_CMD:
+                command_string = "OFF"
+            elif command == ON_OFF_ON_CMD:
+                command_string = "ON"
+        elif cluster == LVL_CTRL_CLUSTER:
+            cluster_string = "LVL_CTRL"
+            command_string = "MV_TO_LVL_ONOFF"
+        elif cluster == COLOR_CTRL_CLUSTER:
+            cluster_string = "COLOR_CTRL"
+            command_string = "MV_TO_TEMPERATURE"
+        else:
+            cluster_string = "UNKNOWN CLUSTER"
+            command_string = "UNKNOWN COMMAND"
+        timestamp = time.strftime("%H:%m:%S", time.localtime())
+        mylogger.info("{};{};{};{};{};{}".format(timestamp, cluster_string, command_string, payload, interval, ret_val))
+    
+    def close_logfile(self):
+        for handler in mylogger.handlers:
+            handler.close()

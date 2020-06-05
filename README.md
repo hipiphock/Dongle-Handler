@@ -107,9 +107,5 @@ When setthing the serial connection with dongle and PC:
 would be required to be set.
 
 # Future Goals & TODO lists
- * Updating BLE & Zigbee configuration files.
  * Unifying BLE CLI and Zigbee CLI.
- * Implementing the return fetching part.
- * Completing the light-color change part.
  * Implementing the GUI for this python program.
- * Implementing logger

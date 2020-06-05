@@ -1,11 +1,20 @@
 # Dongle handler
 **nRF52840 dongle handler with BLE, Zigbee command functions**
 
-The dongle handler is a python program that sends and receives BLE/Zigbee messages to devices that supports BLE/Zigbee connection.
+The dongle handler is a python program that can send & receive BLE/Zigbee messages to devices that supports BLE/Zigbee connection.
 
-It supports both batch mode and interactive mode.
+# Build
 
 # Design
+The programmed dongle basically sends ZigBee/BLE commands to particular IoT device.
+
+The program consists of three parts:
+ * Device
+ * Task
+ * Task Routine
+
+The Task Routine is the core structure of this project.
+
 The program can do three things:
  * It can register & remove devices.
  * It can make & delete command tasks.
@@ -13,81 +22,78 @@ The program can do three things:
 
 The three of those properties are registerd via json files in /resource directory.
 
-# Build
-So far, there is no need to build the program. You just need prerequistic libraries.
-``` shell
-pip3 install zb-cli-wrapper
-```
-## Device registration
+## Device
 The device property consists of:
  * name
  * uuid (this is needed for BLE connection)
  * address (this is the eui64 address for ZigBee commission)
  * endpoint (another element for ZigBee commission)
 
-## Task registration
+The device's **name** represents the target device's name.
+
+The device's **uuid** is needed for sending/receiving BLE services and characteristics.
+
+The device's **address** and **endpoint** are for ZigBee commissioning.
+
+## Task
+Each task represents ZigBee/BLE task to send to target device.
+
 
 ## Making task routine
+This is **the core** of this project. The Task Routine sends commands to the target device specified by **Device**, and receives the message from the target device. Then, it confirms whether the transmission was successfun and the device was OK or not.
 
-
-# Execution
-To execute the program in batch mode, you need **command.json** file and a set of **./config/<CONNECTION_TYPE>/<COMMAND>.json** files.
-
-The **command.json** file consists like this kind of form:
+# Example
+This is the example for the device.
 ``` json
 {
-    "Device": "Ultra Thin Wafer",
-    "uuid": "asdf-qwer-zxcv",
-    "address": "0xe48f",
-    "ep": "8",
-    "command_list": [
-        {
-            "command": "./config/Zigbee/config_zigbee_onoff_on",
-            "iteration": 1
-        },
-        {
-            "command": "./config/Zigbee/config_zigbee_onoff_off",
-            "iteration": 1
-        }
-    ]
+    "name"  :   "Ultra Thin Wafer",
+    "uuid"  :   "0x8e89bed6",
+    "eui64" :   "0xFFFE88571D018E53",
+    "ep"    :   8
 }
 ```
-It contains the target device's information, and a sequence of command list.
 
-The **config.json** file consists like this kind of form:
+This is the example for a single ZigBee task.
 ``` json
 {
-    "connection": "Zigbee",
-    "command": "LVL_CTRL_MV_TO_LVL_CMD",
-    "payloads": [
-        {
-            "value": "0x05",
-            "type": "TYPES.UINT8"
-        },
-        {
-            "value": "0x00",
-            "type": "TYPES.UINT16"
-        }
+    "cluster":      "0x0300",
+    "command":      "0x0a",
+    "payloads":     [[333, "0x21"], [0, "0x21"]],
+    "duration":     0.5
+}
+```
+
+And finally, this is the example for one task routine.
+``` json
+{
+    "device"    :   "DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json",
+    "connection":   0,
+    "task_list" :   [
+        "DongleHandler\\..\\resource\\command\\Zigbee\\off.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\on.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\level_100.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\level_50.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\level_10.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\color_dl.json",
+        "DongleHandler\\..\\resource\\command\\Zigbee\\color_sw.json"
     ],
-    "duration": "2"
+    "iteration" :   3
 }
 ```
-Each config.json files specifies the type of connection they are willing to connect, a specific command to send, and payloads if necessary.
 
-통신을 하려는 device의 정보(이름과 uuid)와 통신하는 방식을 정의한 후, 원하는 service와 해당 service의 characteristic 중 하나에 대해서 대해서 상세하게 서술한다.
+# Prerequisites
+Check your device whether the device supports the dongle or not.
+This project aims to nRF 52840 Dongle.
 
-해당 characteristic의 type이 read인지, write인지, notify인지에 따라서 value를 보낼 것인지 받을 것인지가 달라진다.
+Not that if you confirmed that the program supports your device, make sure to program your dongle with **zigbee-cli-wrapper** by Nordic Semiconductors.
 
-## Interactive Mode
-현재의 프로그램은 다음 명령어를 가지고 있다.
- * on
- * off
- * low
- * mid
- * high
- * quit
+You can easily program your dongle with this [instruction](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fsdk_tz_v4.0.0%2Fzigbee_cli_wrapper.html).
 
-직접 쳐보면서 이게 무슨 명령어인지 파악해보자 :)
+After installing the wrapper to your dongle,
+
+``` shell
+pip3 install zb-cli-wrapper
+```
 
 # Hardware Requirements
 This program is made for nRF52840 dongle from Nordic Semiconductor.

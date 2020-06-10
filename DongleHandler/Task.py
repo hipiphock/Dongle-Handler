@@ -9,6 +9,7 @@ class Task:
         self.payloads = payloads
         self.duration = duration
 
+    # OnOffTransitionTime is very important
     @classmethod
     def generate_regular_random_task(cls, cluster, command):
         if cluster == ON_OFF_CLUSTER:
@@ -19,10 +20,11 @@ class Task:
             command = LVL_CTRL_MV_TO_LVL_ONOFF_CMD
             randval1 = random.randint(0x00, 0xfe)
             # randval2 = random.randint(0x0000, 0xffff)
-            randval2 = 0
+            randval2 = random.randint(0x0000, 0x000A)
+            # randval2 = 0
             payloads = [(randval1, TYPES.UINT8), (randval2, TYPES.UINT16)]
-            # duration = randval2*0.1
-            duration = 0.5
+            duration = randval2*0.1 + 0.01
+            # duration = 0.5
         elif cluster == COLOR_CTRL_CLUSTER:
             command = COLOR_CTRL_MV_TO_TEMPERATURE_CMD
             randval1 = random.randint(200, 370)

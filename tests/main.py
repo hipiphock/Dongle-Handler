@@ -11,25 +11,26 @@ if __name__ == "__main__":
 
     # simple, pre-defined routine for test
     # simple_routine = parse_json_task_routine('DongleHandler\\..\\resource\\task_routine\\sample_routine.json')
-    # simple_routine.start_routine()
+    simple_routine = parse_json_task_routine('DongleHandler\\..\\resource\\task_routine\\color_routine.json')
+    simple_routine.start_routine()
 
     # generate regular random samples
     TIME_INTERVAL = 1
 
-    print("Random Regular")
-    regular_random_task_list = []
-    for i in range(5):
-        task = Task.generate_regular_random_task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, TIME_INTERVAL)
-        regular_random_task_list.append(task)
-    for i in range(5):
-        task = Task.generate_regular_random_task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, TIME_INTERVAL)
-        regular_random_task_list.append(task)
-    for i in range(5):
-        task = Task.generate_regular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, TIME_INTERVAL)
-        regular_random_task_list.append(task)
-    device = parse_json_device('DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json')
-    regular_task_routine = TaskRoutine(device, 0, regular_random_task_list, 1)
-    regular_task_routine.start_routine()
+    # print("Random Regular")
+    # regular_random_task_list = []
+    # for i in range(5):
+    #     task = Task.generate_regular_random_task(ON_OFF_CLUSTER, ON_OFF_OFF_CMD, TIME_INTERVAL)
+    #     regular_random_task_list.append(task)
+    # for i in range(5):
+    #     task = Task.generate_regular_random_task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, TIME_INTERVAL)
+    #     regular_random_task_list.append(task)
+    # for i in range(5):
+    #     task = Task.generate_regular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, TIME_INTERVAL)
+    #     regular_random_task_list.append(task)
+    # device = parse_json_device('DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json')
+    # regular_task_routine = TaskRoutine(device, 0, regular_random_task_list, 1)
+    # regular_task_routine.start_routine()
 
     # # generate irregular random samples
     # print("Random Irregular")

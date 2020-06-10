@@ -49,6 +49,7 @@ def parse_json_task_routine(file_name):
 # parsing command file
 # TODO: deal with payloads
 def parse_json_command(file_name):
+    duration = 0.5
     with open(file_name) as command_file:
         content = json.load(command_file)
         cluster    = int(content['cluster'], 16)
@@ -58,5 +59,6 @@ def parse_json_command(file_name):
             payloads = None
         else:
             payloads   = [(_payloads[0][0], int(_payloads[0][1], 16)), (_payloads[1][0], int(_payloads[1][1], 16))]
-        duration   = content['duration']
-        return Task(cluster, command, payloads, duration)
+            if payloads[1][0] != 0:
+                duration = payloads[1][0]*0.1
+    return Task(cluster, command, payloads, duration)

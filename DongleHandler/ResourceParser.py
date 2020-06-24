@@ -1,3 +1,5 @@
+##### WARNING: DEPRECATED! #####
+
 import json
 from DongleHandler import *
 

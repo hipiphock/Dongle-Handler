@@ -2,7 +2,7 @@
 import json
 from DongleHandler import *
 
-def parse_command(file_name):
+def parse_commands(file_name):
     task_list = []
     duration = 0.5
     with open(file_name) as command_file:

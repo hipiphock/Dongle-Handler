@@ -1,0 +1,15 @@
+{
+    "commands": [
+        "{\"cluster\": \"0x0006\", \"command\": \"0x01\", \"payloads\": \"None\", \"duration\": 0.5}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}",
+        "{\"cluster\": \"0x0300\", \"command\": \"0x0a\", \"payloads\": [[249, \"0x21\"], [0, \"0x21\"]]}"
+    ]
+}

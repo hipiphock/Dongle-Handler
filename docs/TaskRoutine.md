@@ -2,7 +2,7 @@
 **TaskRoutine.py** is the key structure of this Dongle-Handler. The basic routine of the DongleHandler is done with `TaskRoutine.start_routine()`.
 
 Class **TaskRoutine** consists of `device`, `connection_type`, `task_list`, and `iteration`.
- * The `device` is an instance generated from **Device** class. You can find more detail about device in [device.md](https://github.com/hipiphock/Dongle-Handler/docs/device.md).
+ * The `device` is an instance generated from **Device** class. You can find more detail about device in [device.md](https://github.com/hipiphock/Dongle-Handler/blob/master/docs/Device.md).
 
 * `connection_type` determines whether the connection type is BLE format or Zigbee format. If `connection_type == 0`, then it is communicating with ZigBee protocol. If `connection_type == 1`, then it is communicating with BLE protocol.
 

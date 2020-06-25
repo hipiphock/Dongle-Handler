@@ -1,3 +1,2 @@
 # Device
-Now, let's think of a device.
-Basically, we are 
+The **Device.py** file represents a BLE/ZigBee device.

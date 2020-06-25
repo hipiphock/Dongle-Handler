@@ -25,6 +25,7 @@ class TaskRoutine:
         # Before connecting the device with the dongle,
         # the dongle must join the hub's network.
         # TODO: implement automated port selector
+        # TODO: change the directory's path
         with open('DongleHandler\\..\\resource\\dongle_status.json', "r") as dongle_file:
             dongle_config = json.load(dongle_file)
             port = dongle_config['port']
@@ -36,6 +37,7 @@ class TaskRoutine:
             cli_instance.bdb.channel = [24]
             cli_instance.bdb.role = 'zr'
             cli_instance.bdb.start()
+            # TODO: change the directory's path
             with open('DongleHandler\\..\\resource\\dongle_status.json', "w") as dongle_file:
                 dongle_config['status'] = 1
                 json.dump(dongle_config, dongle_file)

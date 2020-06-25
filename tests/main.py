@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     # simple, pre-defined routine for test
     # simple_routine = parse_json_task_routine('DongleHandler\\..\\resource\\task_routine\\sample_routine.json')
+    # TODO: change the directory's path
     device = parse_json_device('DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json')
     sample_task_list = parse_commands('DongleHandler\\..\\resource\\sample_commands.json')
     task_routine = TaskRoutine(device, 0, sample_task_list, 1)

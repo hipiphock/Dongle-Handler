@@ -61,9 +61,12 @@ class TaskRoutine:
         for i in range(self.iteration):
             for task in self.task_list:
                 if task.command == READ_ATTRIBUTE_CMD:
-                    pass
+                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
+                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 elif task.command == WRITE_ATTRIBUTE_CMD:
-                    pass
+                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
+                    cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                 else:
                     if task.payloads == None:
                         cli_instance.zcl.generic(
@@ -82,8 +85,8 @@ class TaskRoutine:
                             payload=task.payloads)
                     time.sleep(task.duration)
                     attr_id, attr_type = get_attr_element(task.cluster, task.command)
-                    attr = Attribute(task.cluster, attr_id, attr_type)
-                    returned_attr = cli_instance.zcl.readattr(self.device.addr, attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    param_attr = Attribute(task.cluster, attr_id, attr_type)
+                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                     zblogger.get_log(task.cluster, task.command, task.payloads, task.duration, returned_attr.value)
                 
 
@@ -121,7 +124,7 @@ class ZigbeeLogger:
     def log_init(self):
         timestring = time.strftime("%Y.%m.%d.%H.%M.%S.", time.gmtime())
         miliseconds = str(int(round(time.time()*1000)))
-        log_name = "DongleHandler\\..\\logs\\" + timestring + miliseconds + ".log"
+        log_name = "logs\\" + timestring + miliseconds + ".log"
         file_handler = logging.FileHandler(log_name)
         mylogger.addHandler(file_handler)
         mylogger.info("PROGRAM START")
@@ -145,6 +148,9 @@ class ZigbeeLogger:
             command_string = "UNKNOWN COMMAND"
         timestamp = time.strftime("%H:%m:%S", time.localtime())
         mylogger.info("{};{};{};{};{};{}".format(timestamp, cluster_string, command_string, payload, interval, ret_val))
+
+    def get_attr_log(self, cluster, attribute, ret_val):
+        pass
     
     def close_logfile(self):
         for handler in mylogger.handlers:

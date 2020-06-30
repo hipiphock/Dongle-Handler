@@ -8,11 +8,12 @@ from DongleHandler.Constants import *
 # 2. Task that reads attribute from the device
 # 3. Task that writes attribute to the device
 class Task:
-    def __init__(self, cluster, command, attribute, payloads, duration):
+    def __init__(self, cluster, command, payloads, attr_id, attr_type, duration):
         self.cluster    = cluster
         self.command    = command
-        self.attribute  = attribute
         self.payloads   = payloads
+        self.attr_id    = attr_id
+        self.attr_type  = attr_type
         self.duration   = duration
 
     # OnOffTransitionTime is very important
@@ -64,3 +65,10 @@ class Task:
             # duration = randval2*0.1
             duration = 0.5
         return cls(cluster, command, payloads, duration)
+
+def duration_control(payload):
+    duration = 0
+    if payload[1][1] < 5:
+        duration = 0.51
+    else:
+        duration = 0.1*payload[1][1] + 0.01

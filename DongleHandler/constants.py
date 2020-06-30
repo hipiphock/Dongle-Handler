@@ -56,6 +56,9 @@ PRESSURE_CLUSTER    = 0x0403
 ZCL_VERSION_ATTR              = 0x0000
 IDENTIFY_IDENTIFY_TIME_ATTR   = 0x0000
 
+CLUSTER_REVISION_ATTR         = 0xfffd      # added by @hipiphock
+ATTR_REPORTING_STATUS_ATTR    = 0xfffe      # added by @hipiphock
+
 SCENE_SCENE_COUNT_ATTR        = 0X0000      # added by @hipiphock
 SCENE_CURRENT_SCENE_ATTR      = 0x0001      # added by @hipiphock
 SCENE_CURRENT_GROUP_ATTR      = 0X0002      # added by @hipiphock

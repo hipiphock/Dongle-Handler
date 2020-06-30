@@ -19,6 +19,7 @@ def parse_commands(file_name):
                 payloads   = [(_payloads[0][0], int(_payloads[0][1], 16)), (_payloads[1][0], int(_payloads[1][1], 16))]
                 if payloads[1][0] != 0:
                     duration = payloads[1][0]*0.1
-            task = Task(cluster, command, payloads, duration)
+            attribute = 0
+            task = Task(cluster, command, attribute, payloads, duration)
             task_list.append(task)
     return task_list

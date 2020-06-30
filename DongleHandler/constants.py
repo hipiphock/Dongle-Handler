@@ -44,6 +44,7 @@ UNKNOWN_IEEE_ADDRESS = 0xFFFFFFFFFFFFFFFF
 
 BASIC_CLUSTER       = 0x0000
 IDENTIFY_CLUSTER    = 0x0003
+SCENE_CLUSTER       = 0X0005                # added by @hipiphock
 ON_OFF_CLUSTER      = 0x0006
 LVL_CTRL_CLUSTER    = 0x0008
 OTA_CLUSTER         = 0x0019
@@ -54,14 +55,33 @@ PRESSURE_CLUSTER    = 0x0403
 
 ZCL_VERSION_ATTR              = 0x0000
 IDENTIFY_IDENTIFY_TIME_ATTR   = 0x0000
+
+SCENE_SCENE_COUNT_ATTR        = 0X0000      # added by @hipiphock
+SCENE_CURRENT_SCENE_ATTR      = 0x0001      # added by @hipiphock
+SCENE_CURRENT_GROUP_ATTR      = 0X0002      # added by @hipiphock
+SCENE_SCENE_VALID_ATTR        = 0X0003      # added by @hipiphock
+SCENE_NAME_SUPPORT_ATTR       = 0X0004      # added by @hipiphock
+
 ON_OFF_ONOFF_ATTR             = 0x0000
+
 LVL_CTRL_CURR_LVL_ATTR        = 0x0000
+LVL_CTRL_REMAIN_TIME_ATTR     = 0X0001      # added by @hipiphock
 LVL_CTRL_ONOFF_TRANS_TIME_ATTR= 0x0010      
 LVL_CTRL_ON_LEVEL_ATTR        = 0X0011      # added by @hipiphock
 DOOR_LOCK_LOCK_STATE          = 0x0000
-COLOR_CTRL_CURR_HUE_ATTR      = 0x0000
-COLOR_CTRL_CURR_SAT_ATTR      = 0x0001
-COLOR_CTRL_TEMP_MIRED_ATTR    = 0X0007      # added by @hipiphock
+
+COLOR_CTRL_CURR_HUE_ATTR                = 0x0000
+COLOR_CTRL_CURR_SAT_ATTR                = 0x0001
+COLOR_CTRL_REMAINING_TIME_ATTR          = 0x0002        # added by @hipiphock
+COLOR_CTRL_CURR_X_ATTR                  = 0X0003        # added by @hipiphock
+COLOR_CTRL_CURR_Y_ATTR                  = 0X0004        # added by @hipiphock
+COLOR_CTRL_COLOR_TEMP_MIRED_ATTR        = 0X0007        # added by @hipiphock
+COLOR_CTRL_COLOR_MODE_ATTR              = 0X0008        # added by @hipiphock
+COLOR_CTRL_ENHANCED_COLOR_MODE_ATTR     = 0x4001        # added by @hipiphock
+COLOR_CTRL_COLOR_CAPABILITY_ATTR        = 0x400a        # added by @hipiphock
+COLOR_CTRL_COLOR_TEMP_MIN_MIRED_ATTR    = 0x400b        # added by @hipiphock
+COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR    = 0x400c        # added by @hipiphock
+
 OTA_CURRENT_FILE_VERSION_ATTR = 0x0002
 OTA_UPGRADE_SERVER_ID_ATTR    = 0x0000
 
@@ -84,6 +104,9 @@ COLOR_CTRL_MV_TO_TEMPERATURE_CMD  = 0X0a    # added by @hipiphock
 OTA_QUERY_NEXT_IMAGE_RESPONSE_CMD = 0x02
 CONFIGURE_REPORTING_CMD           = 0x06
 READ_ATTRIBUTES_CMD               = 0x00
+
+READ_ATTRIBUTE_CMD                = -1      # added by @hipiphock
+WRITE_ATTRIBUTE_CMD               = -2      # added by @hipiphock
 
 FRAME_CTRL_TYPE_PROFILE_WIDE     = 0b00
 FRAME_CTRL_TYPE_CLUSTER_SPECIFIC = 0b01

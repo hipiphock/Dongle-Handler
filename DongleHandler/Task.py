@@ -1,13 +1,19 @@
 # Task is an element for each task routine
+# TODO: add readattr command
 import random
 from DongleHandler.Constants import *
 
+# There are two types of tasks:
+# 1. Task that just sends commnad
+# 2. Task that reads attribute from the device
+# 3. Task that writes attribute to the device
 class Task:
-    def __init__(self, cluster, command, payloads, duration):
-        self.cluster = cluster
-        self.command = command
-        self.payloads = payloads
-        self.duration = duration
+    def __init__(self, cluster, command, attribute, payloads, duration):
+        self.cluster    = cluster
+        self.command    = command
+        self.attribute  = attribute
+        self.payloads   = payloads
+        self.duration   = duration
 
     # OnOffTransitionTime is very important
     @classmethod

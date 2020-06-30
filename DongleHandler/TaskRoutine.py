@@ -7,6 +7,11 @@ from DongleHandler import *
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
 
+# added for clear path
+# TODO: need to clean path problem
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Work Routine for
 class TaskRoutine:
@@ -25,8 +30,7 @@ class TaskRoutine:
         # Before connecting the device with the dongle,
         # the dongle must join the hub's network.
         # TODO: implement automated port selector
-        # TODO: change the directory's path
-        with open('DongleHandler\\..\\resource\\dongle_status.json', "r") as dongle_file:
+        with open('resource\\dongle_status.json', "r") as dongle_file:
             dongle_config = json.load(dongle_file)
             port = dongle_config['port']
             status = dongle_config['status']
@@ -38,7 +42,7 @@ class TaskRoutine:
             cli_instance.bdb.role = 'zr'
             cli_instance.bdb.start()
             # TODO: change the directory's path
-            with open('DongleHandler\\..\\resource\\dongle_status.json', "w") as dongle_file:
+            with open('resource\\dongle_status.json', "w") as dongle_file:
                 dongle_config['status'] = 1
                 json.dump(dongle_config, dongle_file)
                 dongle_file.close()
@@ -56,26 +60,31 @@ class TaskRoutine:
         # do the task_list
         for i in range(self.iteration):
             for task in self.task_list:
-                if task.payloads == None:
-                    cli_instance.zcl.generic(
-                        eui64=self.device.addr,
-                        ep=self.device.ep,
-                        profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                        cluster=task.cluster,
-                        cmd_id=task.command)
+                if task.command == READ_ATTRIBUTE_CMD:
+                    pass
+                elif task.command == WRITE_ATTRIBUTE_CMD:
+                    pass
                 else:
-                    cli_instance.zcl.generic(
-                        eui64=self.device.addr,
-                        ep=self.device.ep,
-                        profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                        cluster=task.cluster,
-                        cmd_id=task.command,
-                        payload=task.payloads)
-                time.sleep(task.duration)
-                attr_id, attr_type = get_attr_element(task.cluster, task.command)
-                attr = Attribute(task.cluster, attr_id, attr_type)
-                returned_attr = cli_instance.zcl.readattr(self.device.addr, attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                zblogger.get_log(task.cluster, task.command, task.payloads, task.duration, returned_attr.value)
+                    if task.payloads == None:
+                        cli_instance.zcl.generic(
+                            eui64=self.device.addr,
+                            ep=self.device.ep,
+                            profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                            cluster=task.cluster,
+                            cmd_id=task.command)
+                    else:
+                        cli_instance.zcl.generic(
+                            eui64=self.device.addr,
+                            ep=self.device.ep,
+                            profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                            cluster=task.cluster,
+                            cmd_id=task.command,
+                            payload=task.payloads)
+                    time.sleep(task.duration)
+                    attr_id, attr_type = get_attr_element(task.cluster, task.command)
+                    attr = Attribute(task.cluster, attr_id, attr_type)
+                    returned_attr = cli_instance.zcl.readattr(self.device.addr, attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    zblogger.get_log(task.cluster, task.command, task.payloads, task.duration, returned_attr.value)
                 
 
         # # each task routine ends with disconnection
@@ -100,7 +109,7 @@ def get_attr_element(cluster, command):
         attr_id = LVL_CTRL_CURR_LVL_ATTR
         attr_type = TYPES.UINT8
     elif cluster == 0x0300:
-        attr_id = COLOR_CTRL_TEMP_MIRED_ATTR
+        attr_id = COLOR_CTRL_COLOR_TEMP_MIRED_ATTR
         attr_type = TYPES.UINT16
     return attr_id, attr_type
 

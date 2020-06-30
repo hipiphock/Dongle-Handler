@@ -1,0 +1,10 @@
+{
+	"device": "DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json",
+	"connection": 0,
+	"task_list": [
+		"DongleHandler\\..\\resource\\command\\Zigbee\\off.json",
+		"DongleHandler\\..\\resource\\command\\Zigbee\\off.json",
+		"DongleHandler\\..\\resource\\command\\Zigbee\\off.json",
+		"DongleHandler\\..\\resource\\command\\Zigbee\\on.json"
+	]
+}

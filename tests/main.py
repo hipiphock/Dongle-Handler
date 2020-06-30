@@ -10,10 +10,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
     # simple, pre-defined routine for test
-    # simple_routine = parse_json_task_routine('DongleHandler\\..\\resource\\task_routine\\sample_routine.json')
+    # simple_routine = parse_json_task_routine('resource\\task_routine\\sample_routine.json')
     # TODO: change the directory's path
-    device = parse_json_device('DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json')
-    sample_task_list = parse_commands('DongleHandler\\..\\resource\\sample_commands.json')
+    device = parse_json_device('resource\\device\\Ultra Thin Wafer.json')
+    sample_task_list = parse_commands('resource\\sample_commands.json')
     task_routine = TaskRoutine(device, 0, sample_task_list, 1)
     task_routine.start_routine()
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # for i in range(5):
     #     task = Task.generate_regular_random_task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, TIME_INTERVAL)
     #     regular_random_task_list.append(task)
-    # device = parse_json_device('DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json')
+    # device = parse_json_device('resource\\device\\Ultra Thin Wafer.json')
     # regular_task_routine = TaskRoutine(device, 0, regular_random_task_list, 1)
     # regular_task_routine.start_routine()
 

@@ -33,7 +33,7 @@ class Task:
             duration = randval2*0.1 + 0.01
             # duration = 0.5
         elif cluster == COLOR_CTRL_CLUSTER:
-            command = COLOR_CTRL_MV_TO_TEMPERATURE_CMD
+            command = COLOR_CTRL_MV_TO_COLOR_TEMP_CMD
             randval1 = random.randint(200, 370)
             # randval2 = random.randint(0x0001, 0xfeff)
             randval2 = 0
@@ -41,34 +41,17 @@ class Task:
             # duration = randval2*0.1
             duration = 0.5
         return cls(cluster, command, payloads, duration)
-
-    @classmethod
-    def generate_irregular_random_task(cls, cluster, command):
-        if cluster == ON_OFF_CLUSTER:
-            command = random.randint(0x00, 0x01)
-            payloads = None
-            duration = 0.5
-        elif cluster == LVL_CTRL_CLUSTER:
-            command = LVL_CTRL_MV_TO_LVL_ONOFF_CMD
-            randval1 = random.randint(0x00, 0xfe) + 0xff
-            # randval2 = random.randint(0x0000, 0xffff) + 0xffff
-            randval2 = 0
-            payloads = [(randval1, TYPES.UINT8), (randval2, TYPES.UINT16)]
-            # duration = randval2*0.1
-            duration = 0.5
-        elif cluster == COLOR_CTRL_CLUSTER:
-            command = COLOR_CTRL_MV_TO_TEMPERATURE_CMD
-            randval1 = random.randint(0x0000, 0xfeff) + 0xff00
-            # randval2 = random.randint(0x0001, 0xffff) + 0xffff
-            randval2 = 0
-            payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
-            # duration = randval2*0.1
-            duration = 0.5
-        return cls(cluster, command, payloads, duration)
+    
+    def task_to_string(self):
+        ret_str =   '{\"cluster\": \"'  + cluster\
+            +   '", \"command\": \"'    + command\
+            +   '", \"payloads\": \"'   + payloads\
+            +   '", \"attr_id\": \"'    + attr_id\
+            +   '", \"attr_type\": \"'  + attr_type\
+            +   '", \"duration\": \"'   + duration\
+            +   '}'
+        return ret_str
 
 def duration_control(payload):
-    duration = 0
-    if payload[1][1] < 5:
-        duration = 0.51
-    else:
-        duration = 0.1*payload[1][1] + 0.01
+    duration = max(0.1*payload[1][1] + 0.01, 0.51)
+    return duration

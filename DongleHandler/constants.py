@@ -96,14 +96,30 @@ IDENTIFY_UPDATE_COMMISSION_STATE_CMD = 0x03
 ON_OFF_OFF_CMD                    = 0x00
 ON_OFF_ON_CMD                     = 0x01
 ON_OFF_TOGGLE_CMD                 = 0X02    # added by @hipiphock
+
 LVL_CTRL_MV_TO_LVL_CMD            = 0x00
+LVL_CTRL_MOVE_CMD                 = 0X01    # added by @hipiphock
+LVL_CTRL_STEP_CMD                 = 0X02    # added by @hipiphock
+LVL_CTRL_STOP_CMD                 = 0X03    # added by @hipiphock
 LVL_CTRL_MV_TO_LVL_ONOFF_CMD      = 0x04    # added by @hipiphock
+LVL_CTRL_MOVE_ONOFF_CMD           = 0X05    # added by @hipiphock
+LVL_CTRL_STEP_ONOFF_CMD           = 0X06    # added by @hipiphock
+LVL_CTRL_STOP_ONOFF_CMD           = 0X07    # added by @hipiphock
+
 DOOR_LOCK_LOCK_DOOR_CMD           = 0x00
 DOOR_LOCK_UNLOCK_DOOR_CMD         = 0x01
+
 COLOR_CTRL_MV_TO_HUE_CMD          = 0x00
 COLOR_CTRL_MV_TO_SAT_CMD          = 0x03
 COLOR_CTRL_MV_TO_HUE_SAT_CMD      = 0x06
-COLOR_CTRL_MV_TO_TEMPERATURE_CMD  = 0X0a    # added by @hipiphock
+COLOR_CTRL_MV_TO_COLOR_CMD        = 0X07    # added by @hipiphock
+COLOR_CTRL_MOVE_COLOR_CMD         = 0X08    # added by @hipiphock
+COLOR_CTRL_STEP_COLOR_CMD         = 0X09    # added by @hipiphock
+COLOR_CTRL_MV_TO_COLOR_TEMP_CMD  = 0X0a    # added by @hipiphock
+COLOR_CTRL_STOP_MOVE_STEP_CMD     = 0X47    # added by @hipiphock
+COLOR_CTRL_MV_COLOR_TEMP_CMD      = 0X4B    # added by @hipiphock
+CLOLR_CTRL_STEP_COLOR_TEMP_CMD    = 0X4C    # added by @hipiphock
+
 OTA_QUERY_NEXT_IMAGE_RESPONSE_CMD = 0x02
 CONFIGURE_REPORTING_CMD           = 0x06
 READ_ATTRIBUTES_CMD               = 0x00

@@ -19,8 +19,8 @@ if __name__ == "__main__":
     # mid_task    = Task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, [(0x50, TYPES.UINT8), (6, TYPES.UINT16)], 0.61)
     high_task   = Task(LVL_CTRL_CLUSTER, LVL_CTRL_MV_TO_LVL_ONOFF_CMD, [(0xFD, TYPES.UINT8), (6, TYPES.UINT16)], 0.61)
 
-    # sw_light_task = Task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, [(370, TYPES.UINT16), (5, TYPES.UINT16)], 0.5)
-    # dl_light_task = Task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_TEMPERATURE_CMD, [(200, TYPES.UINT16), (5, TYPES.UINT16)], 0.5)
+    # sw_light_task = Task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_COLOR_TEMP_CMD, [(370, TYPES.UINT16), (5, TYPES.UINT16)], 0.5)
+    # dl_light_task = Task(COLOR_CTRL_CLUSTER, COLOR_CTRL_MV_TO_COLOR_TEMP_CMD, [(200, TYPES.UINT16), (5, TYPES.UINT16)], 0.5)
 
     task_list = []
     # task_list.append(off_task)

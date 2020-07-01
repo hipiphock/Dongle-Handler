@@ -93,6 +93,17 @@ IDENTIFY_IDENTIFY_QUERY_CMD          = 0x01
 IDENTIFY_EZ_MODE_INVOKE_CMD          = 0x02
 IDENTIFY_UPDATE_COMMISSION_STATE_CMD = 0x03
 
+SCENE_ADD_SCENE_CMD               = 0x00    # added by @hipiphock
+SCENE_VEIW_SCENE_CMD              = 0X01    # added by @hipiphock
+SCENE_REMOVE_SCENE_CMD            = 0X02    # added by @hipiphock
+SCENE_REMOVE_ALL_SCENE_CMD        = 0X03    # added by @hipiphock
+SCENE_STORE_SCENE_CMD             = 0X04    # added by @hipiphock
+SCENE_RECALL_SCENE_CMD            = 0X05    # added by @hipiphock
+SCENE_GET_SCENE_MEMBERSHIP_CMD    = 0X06    # added by @hipiphock
+SCENE_ENHANCED_ADD_SCENE_CMD      = 0X40    # added by @hipiphock
+SCENE_ENHANCED_VIEW_SCENE_CMD     = 0X41    # added by @hipiphock
+SCENE_COPY_SCENE_CMD              = 0X42    # added by @hipiphock
+
 ON_OFF_OFF_CMD                    = 0x00
 ON_OFF_ON_CMD                     = 0x01
 ON_OFF_TOGGLE_CMD                 = 0X02    # added by @hipiphock
@@ -115,7 +126,7 @@ COLOR_CTRL_MV_TO_HUE_SAT_CMD      = 0x06
 COLOR_CTRL_MV_TO_COLOR_CMD        = 0X07    # added by @hipiphock
 COLOR_CTRL_MOVE_COLOR_CMD         = 0X08    # added by @hipiphock
 COLOR_CTRL_STEP_COLOR_CMD         = 0X09    # added by @hipiphock
-COLOR_CTRL_MV_TO_COLOR_TEMP_CMD  = 0X0a    # added by @hipiphock
+COLOR_CTRL_MV_TO_COLOR_TEMP_CMD   = 0X0a    # added by @hipiphock
 COLOR_CTRL_STOP_MOVE_STEP_CMD     = 0X47    # added by @hipiphock
 COLOR_CTRL_MV_COLOR_TEMP_CMD      = 0X4B    # added by @hipiphock
 CLOLR_CTRL_STEP_COLOR_TEMP_CMD    = 0X4C    # added by @hipiphock

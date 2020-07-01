@@ -135,8 +135,9 @@ OTA_QUERY_NEXT_IMAGE_RESPONSE_CMD = 0x02
 CONFIGURE_REPORTING_CMD           = 0x06
 READ_ATTRIBUTES_CMD               = 0x00
 
-READ_ATTRIBUTE_CMD                = -1      # added by @hipiphock
-WRITE_ATTRIBUTE_CMD               = -2      # added by @hipiphock
+COMMAND_TASK                      = 0       # added by @hipiphock
+READ_ATTRIBUTE_TASK               = -1      # added by @hipiphock
+WRITE_ATTRIBUTE_TASK              = -2      # added by @hipiphock
 
 FRAME_CTRL_TYPE_PROFILE_WIDE     = 0b00
 FRAME_CTRL_TYPE_CLUSTER_SPECIFIC = 0b01

@@ -110,6 +110,17 @@ class Cmd(Task):
             elif command == CLOLR_CTRL_STEP_COLOR_TEMP_CMD:
                 payloads = None
 
+    def get_changed_attr_list(self):
+        attr_list = []
+        # 천민 코딩 각
+        if self.cluster == ON_OFF_CLUSTER:
+            pass
+        elif self.cluster == LVL_CTRL_CLUSTER:
+            pass
+        elif self.cluster == COLOR_CTRL_CLUSTER:
+            pass
+        return attr_list
+
 class ReadAttr(Task):
     def __init__(self, cluster, attr_id, attr_type, duration):
         super().__init__(cluster, 1, duration)

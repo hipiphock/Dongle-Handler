@@ -1,4 +1,4 @@
-# new resource parser
+123# new resource parser
 import random
 import json
 from DongleHandler import *
@@ -19,6 +19,8 @@ def generate_task_list_json(file_name, num_tasks):
             cmd_str = cmd_task.task_to_string()
             commands['commands'].append(cmd_str)
             # TODO: automatically add read attribute task for logging and certifying command
+            # get attribute id, type
+            attr_list = cmd_task.get_changed_attr_list()
             
         elif task_kind == READ_ATTRIBUTE_TASK:
             pass

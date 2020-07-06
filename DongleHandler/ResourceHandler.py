@@ -21,7 +21,7 @@ def generate_task_list_json(file_name, num_tasks):
             # get attribute id, type
             attr_list = cmd_task.get_dependent_attr_list()
             for attr in attr_list:
-                read_attr = ReadAttr(cluster, attr, 0.51)
+                read_attr = ReadAttr(cluster, attr, cmd_task.duration)
                 read_attr_str = read_attr.task_to_string()
                 tasks['tasks'].append(read_attr_str)
 

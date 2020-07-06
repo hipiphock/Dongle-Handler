@@ -53,6 +53,7 @@ class Cmd(Task):
                 level = random.randint(0x00, 0xfe)
                 trans_time = random.randint(0x0000, 0x0014)
                 payloads = [(level, TYPES.UINT8), (trans_time, TYPES.UINT16)]
+                duration = max(0.51, 0.1*trans_time + 0.01)
 
             elif command == LVL_CTRL_MOVE_CMD:
                 mv_mode = 8
@@ -64,45 +65,58 @@ class Cmd(Task):
                 step_size = 0
                 trans_time = random.randint(0x0000, 0x0014)
                 payloads = [(step_mode, TYPES.ENUM8), (step_size, TYPES.UINT8), (trans_time, TYPES.UINT16)]
+                duration = max(0.51, 0.1*trans_time + 0.01)
             
             elif command == LVL_CTRL_STOP_CMD or command == LVL_CTRL_STOP_ONOFF_CMD:
                 payloads = None
 
         elif cluster == COLOR_CTRL_CLUSTER:
             if command == COLOR_CTRL_MV_TO_COLOR_CMD:
-                randval1 = random.randint(0x0000, 0xfeff)
-                randval2 = random.randint(0x0000, 0xfeff)
-                randval3 = random.randint(0x0000, 0xfeff)
-                payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16), (randval3, TYPES.UINT16)]
+                colorx = random.randint(0x0000, 0xfeff)
+                colory = random.randint(0x0000, 0xfeff)
+                trans_time = random.randint(0x0000, 0x0014)
+                payloads = [(colorx, TYPES.UINT16), (colory, TYPES.UINT16), (trans_time, TYPES.UINT16)]
+                duration = max(0.51, 0.1*trans_time + 0.01)
             
             elif command == COLOR_CTRL_MOVE_COLOR_CMD:
-                randval1 = random.randint(0x0000, 0xfeff)
-                randval2 = random.randint(0x0000, 0xfeff)
-                payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
+                colorx = random.randint(0x0000, 0xfeff)
+                colory = random.randint(0x0000, 0xfeff)
+                payloads = [(colorx, TYPES.UINT16), (colory, TYPES.UINT16)]
 
             elif command == COLOR_CTRL_STEP_COLOR_CMD:
-                randval1 = random.randint(0x0000, 0xfeff)
-                randval2 = random.randint(0x0000, 0xfeff)
-                randval3 = random.randint(0x0000, 0xfeff)
-                payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16), (randval3, TYPES.UINT16)]
+                colorx = random.randint(0x0000, 0xfeff)
+                colory = random.randint(0x0000, 0xfeff)
+                trans_time = random.randint(0x0000, 0x0014)
+                payloads = [(colorx, TYPES.UINT16), (colory, TYPES.UINT16), (trans_time, TYPES.UINT16)]
+                duration = max(0.51, 0.1*trans_time + 0.01)
 
             elif command == COLOR_CTRL_MV_TO_COLOR_TEMP_CMD:
-                randval1 = random.randint(0x0000, 0xfeff)
-                randval2 = random.randint(0x0000, 0xfeff)
-                payloads = [(randval1, TYPES.UINT16), (randval2, TYPES.UINT16)]
+                color_tmp_mired = random.randint(0x0000, 0xfeff)
+                trans_time = random.randint(0x0000, 0x0014)
+                payloads = [(color_tmp_mired, TYPES.UINT16), (trans_time, TYPES.UINT16)]
+                duration = max(0.51, 0.1*trans_time + 0.01)
             
             elif command == COLOR_CTRL_STOP_MOVE_STEP_CMD:
                 payloads = None
 
             elif command == COLOR_CTRL_MV_COLOR_TEMP_CMD:
-                randval1 = 0
-                randval2 = random.randint(0x0000, 0xfeff)
-                randval3 = random.randint(0x0000, 0xfeff)
-                randval4 = random.randint(0x0000, 0xfeff)
-                payloads = [(randval1, TYPES.MAP8), (randval2, TYPES.UINT16), (randval3, TYPES.UINT16), (randval4, TYPES.UINT16)]
+                move_mode = 0
+                rate = random.randint(0x0000, 0xfeff)
+                color_temp_min_mired = random.randint(0x0000, 0xfeff)
+                color_temp_max_mired = random.randint(0x0000, 0xfeff)
+                payloads = [(move_mode, TYPES.MAP8), (rate, TYPES.UINT16), (color_temp_min_mired, TYPES.UINT16), (color_temp_max_mired, TYPES.UINT16)]
             
             elif command == COLOR_CTRL_STEP_COLOR_TEMP_CMD:
-                payloads = None
+                step_mode = 0
+                step_size = 0
+                trans_time = random.randint(0x0000, 0x0014)
+                color_temp_min_mired = random.randint(0x0000, 0xfeff)
+                color_temp_max_mired = random.randint(0x0000, 0xfeff)
+                payloads = [(step_mode, TYPES.MAP8), (step_size, TYPES.UINT16), 
+                    (trans_time, TYPES.UINT16), 
+                    (color_temp_min_mired, TYPES.UINT16),
+                    (color_temp_max_mired, TYPES.UINT16)]
+                duration = max(0.51, 0.1*trans_time + 0.01)
         
         return Cmd(cluster, command, payloads, duration)
 

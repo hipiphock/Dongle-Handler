@@ -20,8 +20,9 @@ if __name__ == "__main__":
     # parse device file
     device = parse_json_device('resource\\device\\Ultra Thin Wafer.json')
     # generate task list
-    generate_task_list_json("resource\\random_task_lists.json", 3)
+    # generate_task_list_json("resource\\random_task_lists.json", 8)
     # parse generated task list
     task_list = parse_task_list("resource\\random_task_lists.json")
     # main routine
     task_routine = TaskRoutine(device, 0, task_list, 2)
+    task_routine.start_routine()

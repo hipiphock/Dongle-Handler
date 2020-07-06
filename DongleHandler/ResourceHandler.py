@@ -1,4 +1,4 @@
-123# new resource parser
+# new resource parser
 import random
 import json
 from DongleHandler import *
@@ -9,11 +9,9 @@ def generate_task_list_json(file_name, num_tasks):
     tasks = {}
     tasks['tasks'] = []
     for i in range(num_tasks):
-
         # select cluster, command, and attribute(optional)
         task_kind   =   int(input("Task Kind: "))
         cluster     =   int(input("Cluster: "))
-
         if task_kind == COMMAND_TASK:
             command =   int(input("Command: "))
             cmd_task = Cmd.generate_random_cmd(cluster, command, 0.51)
@@ -30,13 +28,13 @@ def generate_task_list_json(file_name, num_tasks):
         elif task_kind == READ_ATTRIBUTE_TASK:
             attr_id =   int(input("Attribute: "))
             read_attr = ReadAttr(cluster, attr_id, 0.51)
-            read_attr_str = ReadAttr.task_to_string()
+            read_attr_str = read_attr.task_to_string()
             tasks['tasks'].append(read_attr_str)
 
         elif task_kind == WRITE_ATTRIBUTE_TASK:
-            attr_id = input()
+            attr_id = int(input("Attribute: "))
             write_attr = WriteAttr(cluster, attr_id, 0.51)
-            write_attr_str = WriteAttr.task_to_string()
+            write_attr_str = write_attr.task_to_string()
             tasks['tasks'].append(read_attr_str)
     with open(file_name, 'w') as outfile:
         json.dump(tasks, outfile)
@@ -56,23 +54,23 @@ def parse_task_list(file_name):
     task_list = []
     with open(file_name) as task_file:
         content = json.load(task_file)
-        task_list = content['tasks']
-        for task in task_list:
+        json_task_list = content['tasks']
+        for task in json_task_list:
             parsed_task = json.loads(task)
-            task_kind = int(parsed_task['task_kind'], 16)
-            cluster = int(parsed_task['cluster'], 16)
-            duration = int(parsed_task['duration'], 16)
+            task_kind = parsed_task['task_kind']
+            cluster = parsed_task['cluster']
+            duration = parsed_task['duration']
             if task_kind == COMMAND_TASK:
-                command = int(parsed_task['command'], 16)
+                command = parsed_task['command']
                 payloads = parsed_task['payloads']
                 cmd_task = Cmd(cluster, command, payloads, duration)
                 task_list.append(cmd_task)
             elif task_kind == READ_ATTRIBUTE_TASK:
-                attr_id = int(parsed_task['attr'])
+                attr_id = parsed_task['attr_id']
                 read_attr_task = ReadAttr(cluster, attr_id, duration)
                 task_list.append(read_attr_task)
             elif task_kind == WRITE_ATTRIBUTE_TASK:
-                attr_id = int(parsed_task['attr'])
+                attr_id = parsed_task['attr_id']
                 write_attr_task = WriteAttr(cluster, attr_id, duration)
                 task_list.append(write_attr_task)
             # else:

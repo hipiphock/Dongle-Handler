@@ -1,6 +1,7 @@
 # Task is an element for each task routine
 # TODO: add readattr command
 import random
+import json
 from DongleHandler.Constants import *
 
 # There are two types of tasks:
@@ -117,32 +118,37 @@ class Cmd(Task):
         elif self.cluster == COLOR_CTRL_CLUSTER:
             if self.command == COLOR_CTRL_MV_TO_COLOR_CMD\
                     or self.command == COLOR_CTRL_MOVE_COLOR_CMD\
-                    or self.commnad == COLOR_CTRL_STEP_COLOR_CMD:
+                    or self.command == COLOR_CTRL_STEP_COLOR_CMD:
                 attr_list.append(COLOR_CTRL_COLOR_MODE_ATTR)
                 attr_list.append(COLOR_CTRL_CURR_X_ATTR)
                 attr_list.append(COLOR_CTRL_CURR_Y_ATTR)
-            elif self.commnad == COLOR_CTRL_MV_TO_COLOR_TEMP_CMD:
+
+            elif self.command == COLOR_CTRL_MV_TO_COLOR_TEMP_CMD:
                 attr_list.append(COLOR_CTRL_COLOR_MODE_ATTR)
                 attr_list.append(COLOR_CTRL_COLOR_TEMP_MIRED_ATTR)
+
             elif self.command == COLOR_CTRL_STOP_MOVE_STEP_CMD:
                 attr_list.append(COLOR_CTRL_REMAINING_TIME_ATTR)
+
             elif self.command == COLOR_CTRL_STEP_COLOR_TEMP_CMD:
                 attr_list.append(COLOR_CTRL_COLOR_MODE_ATTR)
                 attr_list.append(COLOR_CTRL_ENHANCED_COLOR_MODE_ATTR)
                 attr_list.append(COLOR_CTRL_COLOR_TEMP_MIRED_ATTR)
                 attr_list.append(COLOR_CTRL_COLOR_TEMP_MIN_MIRED_ATTR)
                 attr_list.append(COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR)
+
         return attr_list
     
     def task_to_string(self):
         super().task_to_string()
-        ret_str =   '{\"task_kind\": \"'+ str(self.task_kind)\
-            +   '", \"cluster\": \"'    + str(self.cluster)\
-            +   '", \"command\": \"'    + str(self.command)\
-            +   '", \"payloads\": \"'   + str(self.payloads)\
-            +   '", \"duration\": \"'   + str(self.duration)\
-            +   '}'
-        return ret_str
+        ret_dic = {
+            "task_kind" :   self.task_kind,
+            "cluster"   :   self.cluster,
+            "command"   :   self.command,
+            "payloads"  :   self.payloads,
+            "duration"  :   self.duration
+        }
+        return json.dumps(ret_dic)
 
 class ReadAttr(Task):
     def __init__(self, cluster, attr_id, duration):
@@ -203,12 +209,13 @@ class ReadAttr(Task):
 
     def task_to_string(self):
         super().task_to_string()
-        ret_str =   '{\"task_kind\": \"'+ str(self.task_kind)\
-            +   '", \"attr_id\": \"'    + str(self.attr_id)\
-            +   '", \"attr_type\": \"'  + str(self.attr_type)\
-            +   '", \"duration\": \"'   + str(self.duration)\
-            +   '}'
-        return ret_str
+        ret_dic = {
+            "task_kind" :   self.task_kind,
+            "cluster"   :   self.cluster,
+            "attr_id"   :   self.attr_id,
+            "duration"  :   self.duration
+        }
+        return json.dumps(ret_dic)
 
 
 class WriteAttr(Task):
@@ -219,9 +226,10 @@ class WriteAttr(Task):
 
         def task_to_string(self):
             super().task_to_string()
-            ret_str =   '{\"task_kind\": \"'+ self.task_kind\
-                +   '", \"attr_id\": \"'    + self.attr_id\
-                +   '", \"attr_type\": \"'  + self.attr_type\
-                +   '", \"duration\": \"'   + self.duration\
-                +   '}'
-            return ret_str
+            ret_dic = {
+                "task_kind" :   self.task_kind,
+                "cluster"   :   self.cluster,
+                "attr_id"   :   self.attr_id,
+                "duration"  :   self.duration
+            }
+            return json.dumps(ret_dic)

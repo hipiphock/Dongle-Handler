@@ -7,11 +7,13 @@ from DongleHandler import *
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
 
-# added for clear path
-# TODO: need to clean path problem
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+# added for clear path
+# TODO: need to clean path problem
 
 # Work Routine for
 class TaskRoutine:
@@ -55,15 +57,14 @@ class TaskRoutine:
 
         # 1. Start connection with the device.
         # The connection of the device is ruled by SmartThings hub.
-        # Therefore, the only job the dongle needs to do is 
 
         # do the task_list
         for i in range(self.iteration):
             for task in self.task_list:
-                if task.command == READ_ATTRIBUTE_CMD:
+                if task.task_kind == READ_ATTRIBUTE_TASK:
                     param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
                     returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                elif task.command == WRITE_ATTRIBUTE_CMD:
+                elif task.task_kind == WRITE_ATTRIBUTE_TASK:
                     param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
                     cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                     returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
@@ -131,12 +132,17 @@ class ZigbeeLogger:
         mylogger.info("Time\t\tCLuster\t\tCommand\t\tpayload\t\tinterval\t\treturn value")
 
     def get_log(self, cluster, command, payload, interval, ret_val):
+        cluster_string = ""
+        command_string = ""
+        attribute_string = ""
         if cluster == ON_OFF_CLUSTER:
             cluster_string = "ON_OFF"
             if command == ON_OFF_OFF_CMD:
                 command_string = "OFF"
             elif command == ON_OFF_ON_CMD:
                 command_string = "ON"
+            elif command == ON_OFF_TOGGLE_CMD:
+                command_string = "TOGGLE"
         elif cluster == LVL_CTRL_CLUSTER:
             cluster_string = "LVL_CTRL"
             command_string = "MV_TO_LVL_ONOFF"

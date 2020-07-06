@@ -104,7 +104,9 @@ class Cmd(Task):
                 rate = random.randint(0x0000, 0xfeff)
                 color_temp_min_mired = random.randint(0x0000, 0xfeff)
                 color_temp_max_mired = random.randint(0x0000, 0xfeff)
-                payloads = [(move_mode, TYPES.MAP8), (rate, TYPES.UINT16), (color_temp_min_mired, TYPES.UINT16), (color_temp_max_mired, TYPES.UINT16)]
+                payloads = [(move_mode, TYPES.MAP8), (rate, TYPES.UINT16),
+                    (color_temp_min_mired, TYPES.UINT16),
+                    (color_temp_max_mired, TYPES.UINT16)]
             
             elif command == COLOR_CTRL_STEP_COLOR_TEMP_CMD:
                 step_mode = 0
@@ -218,7 +220,6 @@ class ReadAttr(Task):
                 attr_type = TYPES.UINT16
             elif attr_id == COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR:
                 attr_type = TYPES.UINT16
-
         self.attr_type  = attr_type
 
     def task_to_string(self):

@@ -1,5 +1,6 @@
 # main controller of Dongle Handler
 import time
+from datetime import datetime
 import json
 import logging
 
@@ -61,14 +62,7 @@ class TaskRoutine:
         # do the task_list
         for i in range(self.iteration):
             for task in self.task_list:
-                if task.task_kind == READ_ATTRIBUTE_TASK:
-                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
-                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                elif task.task_kind == WRITE_ATTRIBUTE_TASK:
-                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
-                    cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                else:
+                if task.task_kind == COMMAND_TASK:
                     if task.payloads == None:
                         cli_instance.zcl.generic(
                             eui64=self.device.addr,
@@ -88,7 +82,16 @@ class TaskRoutine:
                     attr_id, attr_type = get_attr_element(task.cluster, task.command)
                     param_attr = Attribute(task.cluster, attr_id, attr_type)
                     returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                    zblogger.get_log(task.cluster, task.command, task.payloads, task.duration, returned_attr.value)
+                    zblogger.get_command_log(task)
+                elif task.task_kind == READ_ATTRIBUTE_TASK:
+                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
+                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    zblogger.get_read_attr_log(task, returned_attr.value)
+                elif task.task_kind == WRITE_ATTRIBUTE_TASK:
+                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
+                    cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                    zblogger.get_read_attr_log(task, returned_attr.value)
                 
 
         # # each task routine ends with disconnection
@@ -124,18 +127,20 @@ mylogger.setLevel(logging.INFO)
 # TODO: need to remake logger for attribute tasks
 class ZigbeeLogger:
     def log_init(self):
-        timestring = time.strftime("%Y.%m.%d.%H.%M.%S.", time.gmtime())
-        miliseconds = str(int(round(time.time()*1000)))
-        log_name = "logs\\" + timestring + miliseconds + ".log"
+        timestring = time.strftime("%Y.%m.%d.%H.%M.%S", time.gmtime())
+        log_name = "logs\\" + timestring + ".log"
         file_handler = logging.FileHandler(log_name)
         mylogger.addHandler(file_handler)
         mylogger.info("PROGRAM START")
-        mylogger.info("Time\t\tCLuster\t\tCommand\t\tpayload\t\tinterval\t\treturn value")
+        # mylogger.info("Time\t\tCLuster\t\tCommand\t\tpayload\t\tinterval\t\treturn value")
 
-    def get_log(self, cluster, command, payload, interval, ret_val):
+    def get_command_log(self, task):
+        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        cluster = task.cluster
+        command = task.command
+        payloads = task.payloads
         cluster_string = ""
         command_string = ""
-        attribute_string = ""
         if cluster == ON_OFF_CLUSTER:
             cluster_string = "ON_OFF"
             if command == ON_OFF_OFF_CMD:
@@ -144,20 +149,138 @@ class ZigbeeLogger:
                 command_string = "ON"
             elif command == ON_OFF_TOGGLE_CMD:
                 command_string = "TOGGLE"
+            else:
+                command_string = "UNKNOWN_COMMAND"
         elif cluster == LVL_CTRL_CLUSTER:
             cluster_string = "LVL_CTRL"
-            command_string = "MV_TO_LVL_ONOFF"
+            if command == LVL_CTRL_MV_TO_LVL_CMD:
+                command_string = "MV_TO_LVL"
+            elif command == LVL_CTRL_MOVE_CMD:
+                command_string = "MOVE"
+            elif command == LVL_CTRL_STEP_CMD:
+                command_string = "STEP"
+            elif command == LVL_CTRL_STOP_CMD:
+                command_string = "STOP"
+            elif command == LVL_CTRL_MV_TO_LVL_ONOFF_CMD:
+                command_string = "MV_TO_LVL_ONOFF"
+            elif command == LVL_CTRL_MOVE_ONOFF_CMD:
+                command_string = "MOVE_ONOFF"
+            elif command == LVL_CTRL_STEP_ONOFF_CMD:
+                command_string = "STEP_ONOFF"
+            else:
+                command_string = "UNKNOWN_COMMAND"
         elif cluster == COLOR_CTRL_CLUSTER:
             cluster_string = "COLOR_CTRL"
-            command_string = "MV_TO_TEMPERATURE"
+            if command == COLOR_CTRL_MV_TO_COLOR_CMD:
+                command_string = "MV_TO_COLOR"
+            elif command == COLOR_CTRL_MOVE_COLOR_CMD:
+                command_string = "MOVE_COLOR"
+            elif command == COLOR_CTRL_STEP_COLOR_CMD:
+                command_string = "STEP_COLOR"
+            elif command == COLOR_CTRL_MV_TO_COLOR_TEMP_CMD:
+                command_string = "MV_TO_COLOR_TEMP"
+            elif command == COLOR_CTRL_STOP_MOVE_STEP_CMD:
+                command_string = "STOP_MOVE_STEP"
+            elif command == COLOR_CTRL_MV_COLOR_TEMP_CMD:
+                command_string = "MV_COLOR_TEMP"
+            elif command == COLOR_CTRL_STEP_COLOR_TEMP_CMD:
+                command_string = "STEP_COLOR_TEMP"
+            else:
+                command_string = "UNKNOWN_COMMAND"
         else:
             cluster_string = "UNKNOWN CLUSTER"
             command_string = "UNKNOWN COMMAND"
-        timestamp = time.strftime("%H:%m:%S", time.localtime())
-        mylogger.info("{};{};{};{};{};{}".format(timestamp, cluster_string, command_string, payload, interval, ret_val))
+        mylogger.info("{};{};{};{};{};{}".format(
+            timestamp, "COMMAND_TASK", cluster_string, command_string, payloads, task.duration))
 
-    def get_attr_log(self, cluster, attribute, ret_val):
-        pass
+    def get_read_attr_log(self, task, ret_val):
+        timestamp = datetime.utcnow().strftime("%H:%M:%S.%f")[:-3]
+        cluster = task.cluster
+        attr_id = task.attr_id
+        cluster_string = ""
+        attr_string = ""
+        if cluster == ON_OFF_CLUSTER:
+            cluster_string = "ON_OFF_CLUSTER"
+            attr_string = ON_OFF_ONOFF_ATTR
+        elif cluster == LVL_CTRL_CLUSTER:
+            cluster_string = "LVL_CTRL_CLUSTER"
+            if attr_id == LVL_CTRL_CURR_LVL_ATTR:
+                attr_string = "CURR_LVL"
+            elif attr_id == LVL_CTRL_REMAIN_TIME_ATTR:
+                attr_string = "REMAIN_TIME"
+            elif attr_id == LVL_CTRL_ONOFF_TRANS_TIME_ATTR:
+                attr_string = "ONOFF_TRANS_TIME"
+            elif attr_id == LVL_CTRL_ON_LEVEL_ATTR:
+                attr_string = "ON_LEVEL"
+        elif cluster == COLOR_CTRL_CLUSTER:
+            cluster_string = "COLOR_CTRL_CLUSTER"
+            if attr_id == COLOR_CTRL_CURR_HUE_ATTR:
+                attr_string = "CURR_HUE"
+            elif attr_id == COLOR_CTRL_CURR_SAT_ATTR:
+                attr_string = "CURR_SAT"
+            elif attr_id == COLOR_CTRL_REMAINING_TIME_ATTR:
+                attr_string = "REMAINING_TIME"
+            elif attr_id == COLOR_CTRL_CURR_X_ATTR:
+                attr_string = "CURR_X"
+            elif attr_id == COLOR_CTRL_CURR_Y_ATTR:
+                attr_string = "CURR_Y"
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MIRED_ATTR:
+                attr_string = "COLOR_TEMP_MIRED"
+            elif attr_id == COLOR_CTRL_COLOR_MODE_ATTR:
+                attr_string = "COLOR_MODE"
+            elif attr_id == COLOR_CTRL_ENHANCED_COLOR_MODE_ATTR:
+                attr_string = "ENHANCED_COLOR_MODE"
+            elif attr_id == COLOR_CTRL_COLOR_CAPABILITY_ATTR:
+                attr_string = "COLOR_CAPABILITY"
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MIN_MIRED_ATTR:
+                attr_string = "COLOR_TEMP_MIN_MIRED"
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR:
+                attr_string = "COLOR_TEMP_MAX_MIRED"
+        mylogger.info("{};{};{};{};{};{}".format(
+                timestamp, "READ_ATTRIBUTE_TASK", cluster_string, attr_string, task.duration, ret_val))
+    
+    def get_write_attr_log(self, task):
+        timestamp = datetime.utcnow().strftime("%H:%M:%S.%f")[:-3]
+        cluster = task.cluster
+        attr_id = task.attr_id
+        cluster_string = ""
+        attr_string = ""
+        if cluster == ON_OFF_CLUSTER:
+            attr_string = ON_OFF_ONOFF_ATTR
+        elif cluster == LVL_CTRL_CLUSTER:
+            if attr_id == LVL_CTRL_CURR_LVL_ATTR:
+                attr_string = "CURR_LVL"
+            elif attr_id == LVL_CTRL_REMAIN_TIME_ATTR:
+                attr_string = "REMAIN_TIME"
+            elif attr_id == LVL_CTRL_ONOFF_TRANS_TIME_ATTR:
+                attr_string = "ONOFF_TRANS_TIME"
+            elif attr_id == LVL_CTRL_ON_LEVEL_ATTR:
+                attr_string = "ON_LEVEL"
+        elif cluster == COLOR_CTRL_CLUSTER:
+            if attr_id == COLOR_CTRL_CURR_HUE_ATTR:
+                attr_string = "CURR_HUE"
+            elif attr_id == COLOR_CTRL_CURR_SAT_ATTR:
+                attr_string = "CURR_SAT"
+            elif attr_id == COLOR_CTRL_REMAINING_TIME_ATTR:
+                attr_string = "REMAINING_TIME"
+            elif attr_id == COLOR_CTRL_CURR_X_ATTR:
+                attr_string = "CURR_X"
+            elif attr_id == COLOR_CTRL_CURR_Y_ATTR:
+                attr_string = "CURR_Y"
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MIRED_ATTR:
+                attr_string = "COLOR_TEMP_MIRED"
+            elif attr_id == COLOR_CTRL_COLOR_MODE_ATTR:
+                attr_string = "COLOR_MODE"
+            elif attr_id == COLOR_CTRL_ENHANCED_COLOR_MODE_ATTR:
+                attr_string = "ENHANCED_COLOR_MODE"
+            elif attr_id == COLOR_CTRL_COLOR_CAPABILITY_ATTR:
+                attr_string = "COLOR_CAPABILITY"
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MIN_MIRED_ATTR:
+                attr_string = "COLOR_TEMP_MIN_MIRED"
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR:
+                attr_string = "COLOR_TEMP_MAX_MIRED"
+        mylogger.info("{};{};{};{};{}".format(
+                timestamp, "WRITE_ATTRIBUTE_TASK", cluster_string, attr_string, task.duration))
     
     def close_logfile(self):
         for handler in mylogger.handlers:

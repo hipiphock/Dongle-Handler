@@ -7,25 +7,35 @@ from DongleHandler import *
 # TODO: generate 
 def generate_task_list_json(file_name, num_tasks):
     commands = {}
+    commands['commands'] = []
     for i in range(num_tasks):
         # select cluster, command, and attribute(optional)
         # attribute is selected only on read/write attribute command
-        cluster = input()
-        task_kind = input()
+        task_kind = int(input("Task Kind: "))
+        cluster = int(input("Cluster: "))
         # command
         if task_kind == COMMAND_TASK:
-            command = input()
-            cmd_task = Cmd.generate_random_cmd(cluster, command)
+            command = int(input("Command: "))
+            cmd_task = Cmd.generate_random_cmd(cluster, command, 0.51)
             cmd_str = cmd_task.task_to_string()
             commands['commands'].append(cmd_str)
             # TODO: automatically add read attribute task for logging and certifying command
             # get attribute id, type
             attr_list = cmd_task.get_changed_attr_list()
-            
+            for attr in attr_list:
+                read_attr = ReadAttr(cluster, attr.id, attr.type, 0.51)
+                read_attr_str = ReadAttr.task_to_string()
+                commands['commands'].append(read_attr_str)
         elif task_kind == READ_ATTRIBUTE_TASK:
-            pass
+            attr_id = int(input("Attribute: "))
+            read_attr = ReadAttr(cluster, attr_id, 0.51)
+            read_attr_str = ReadAttr.task_to_string()
+            commands['commands'].append(read_attr_str)
         elif task_kind == WRITE_ATTRIBUTE_TASK:
-            pass
+            attr_id = input()
+            write_attr = WriteAttr(cluster, attr_id, 0.51)
+            write_attr_str = WriteAttr.task_to_string()
+            commands['commands'].append(read_attr_str)
     with open(file_name, 'w') as outfile:
         json.dump(commands, outfile)
 

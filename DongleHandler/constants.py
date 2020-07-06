@@ -69,8 +69,9 @@ ON_OFF_ONOFF_ATTR             = 0x0000
 
 LVL_CTRL_CURR_LVL_ATTR        = 0x0000
 LVL_CTRL_REMAIN_TIME_ATTR     = 0X0001      # added by @hipiphock
-LVL_CTRL_ONOFF_TRANS_TIME_ATTR= 0x0010      
+LVL_CTRL_ONOFF_TRANS_TIME_ATTR= 0x0010      # added by @hipiphock
 LVL_CTRL_ON_LEVEL_ATTR        = 0X0011      # added by @hipiphock
+
 DOOR_LOCK_LOCK_STATE          = 0x0000
 
 COLOR_CTRL_CURR_HUE_ATTR                = 0x0000
@@ -135,10 +136,6 @@ OTA_QUERY_NEXT_IMAGE_RESPONSE_CMD = 0x02
 CONFIGURE_REPORTING_CMD           = 0x06
 READ_ATTRIBUTES_CMD               = 0x00
 
-COMMAND_TASK                      = 0       # added by @hipiphock
-READ_ATTRIBUTE_TASK               = -1      # added by @hipiphock
-WRITE_ATTRIBUTE_TASK              = -2      # added by @hipiphock
-
 FRAME_CTRL_TYPE_PROFILE_WIDE     = 0b00
 FRAME_CTRL_TYPE_CLUSTER_SPECIFIC = 0b01
 FRAME_CTRL_DIRECTION_TO_CLIENT   = 0b1
@@ -168,6 +165,7 @@ class TYPES:
     SINT64 = 0x2f
     ENUM8 = 0x30
     MAP8 = 0x18
+    MAP16 = 0x19
     EUI64 = 0xF0
     STRING = 0x42
 
@@ -193,3 +191,7 @@ DOOR_LOCK_CLOSE = 0
 # added by @hipiphock
 ZIGBEE_CONNECTION           = 0
 BLE_CONNECTION              = 1
+
+COMMAND_TASK                = 0       # added by @hipiphock
+READ_ATTRIBUTE_TASK         = 1      # added by @hipiphock
+WRITE_ATTRIBUTE_TASK        = 2      # added by @hipiphock

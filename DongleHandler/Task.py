@@ -8,21 +8,13 @@ from DongleHandler.Constants import *
 # 2. Task that reads attribute from the device
 # 3. Task that writes attribute to the device
 class Task:
-    def __init__(self, cluster, task_kind, duration):
-        self.cluster    = cluster
+    def __init__(self, task_kind, cluster, duration):
         self.task_kind  = task_kind     # 0=commmand, 1=read_attr, 2=write_attr
+        self.cluster    = cluster
         self.duration   = duration
     
     def task_to_string(self):
         pass
-        # ret_str =   '{\"cluster\": \"'  + cluster\
-        #     +   '", \"command\": \"'    + command\
-        #     +   '", \"payloads\": \"'   + payloads\
-        #     +   '", \"attr_id\": \"'    + attr_id\
-        #     +   '", \"attr_type\": \"'  + attr_type\
-        #     +   '", \"duration\": \"'   + duration\
-        #     +   '}'
-        # return ret_str
 
 def duration_control(payload):
     duration = max(0.1*payload[1][1] + 0.01, 0.51)
@@ -30,12 +22,13 @@ def duration_control(payload):
 
 class Cmd(Task):
     def __init__(self, cluster, command, payloads, duration):
-        super().__init__(cluster, 0, duration)
+        super().__init__(cluster, COMMAND_TASK, duration)
         self.command    = command
         self.payloads   = payloads
+    # additional method for payload generation needed
 
     @classmethod
-    def generate_random_cmd(cls, cluster, command):
+    def generate_random_cmd(cls, cluster, command, duration):
         payloads = None
         if cluster == SCENE_CLUSTER:
             if command == SCENE_ADD_SCENE_CMD:
@@ -109,10 +102,11 @@ class Cmd(Task):
             
             elif command == CLOLR_CTRL_STEP_COLOR_TEMP_CMD:
                 payloads = None
+        
+        return Cmd(cluster, command, payloads, duration)
 
     def get_changed_attr_list(self):
         attr_list = []
-        # 천민 코딩 각
         if self.cluster == ON_OFF_CLUSTER:
             pass
         elif self.cluster == LVL_CTRL_CLUSTER:
@@ -120,15 +114,94 @@ class Cmd(Task):
         elif self.cluster == COLOR_CTRL_CLUSTER:
             pass
         return attr_list
+    
+    def task_to_string(self):
+        super().task_to_string()
+        ret_str =   '{\"task_kind\": \"'+ str(self.task_kind)\
+            +   '", \"command\": \"'    + str(self.command)\
+            +   '", \"payloads\": \"'   + str(self.payloads)\
+            +   '", \"duration\": \"'   + str(self.duration)\
+            +   '}'
+        return ret_str
 
 class ReadAttr(Task):
-    def __init__(self, cluster, attr_id, attr_type, duration):
-        super().__init__(cluster, 1, duration)
+    def __init__(self, cluster, attr_id, duration):
+        super().__init__(READ_ATTRIBUTE_TASK, cluster, duration)
+        self.attr_id = attr_id
+        # automated procedure to get 
+        attr_type = 0
+        if cluster == SCENE_CLUSTER:
+            if attr_id == SCENE_SCENE_COUNT_ATTR:
+                attr_type = TYPES.UINT8
+            elif attr_id == SCENE_CURRENT_SCENE_ATTR:
+                attr_type = TYPES.UINT8
+            elif attr_id == SCENE_CURRENT_GROUP_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == SCENE_SCENE_VALID_ATTR:
+                attr_type = TYPES.BOOL
+            elif attr_id == SCENE_NAME_SUPPORT_ATTR:
+                attr_type = TYPES.MAP8
+
+        elif cluster == ON_OFF_CLUSTER:
+            attr_type = TYPES.BOOL
+        
+        elif cluster == LVL_CTRL_CLUSTER:
+            if attr_id == LVL_CTRL_CURR_LVL_ATTR:
+                attr_type = TYPES.UINT8
+            elif attr_id == LVL_CTRL_REMAIN_TIME_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == LVL_CTRL_ONOFF_TRANS_TIME_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == LVL_CTRL_ON_LEVEL_ATTR:
+                attr_type = TYPES.UINT8
+        
+        elif cluster == COLOR_CTRL_CLUSTER:
+            if attr_id == COLOR_CTRL_CURR_HUE_ATTR:
+                attr_type = TYPES.UINT8
+            elif attr_id == COLOR_CTRL_CURR_SAT_ATTR:
+                attr_type = TYPES.UINT8
+            elif attr_id == COLOR_CTRL_REMAINING_TIME_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == COLOR_CTRL_CURR_X_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == COLOR_CTRL_CURR_Y_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MIRED_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == COLOR_CTRL_COLOR_MODE_ATTR:
+                attr_type = TYPES.ENUM8
+            elif attr_id == COLOR_CTRL_ENHANCED_COLOR_MODE_ATTR:
+                attr_type = TYPES.ENUM8
+            elif attr_id == COLOR_CTRL_COLOR_CAPABILITY_ATTR:
+                attr_type = TYPES.MAP16
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MIN_MIRED_ATTR:
+                attr_type = TYPES.UINT16
+            elif attr_id == COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR:
+                attr_type = TYPES.UINT16
+
+        self.attr_type  = attr_type
+
+    def task_to_string(self):
+        super().task_to_string()
+        ret_str =   '{\"task_kind\": \"'+ self.task_kind\
+            +   '", \"attr_id\": \"'    + self.attr_id\
+            +   '", \"attr_type\": \"'  + self.attr_type\
+            +   '", \"duration\": \"'   + self.duration\
+            +   '}'
+        return ret_str
+
+
+class WriteAttr(Task):
+    def __init__(self, cluster, attr_id, duration):
+        super().__init__(WRITE_ATTRIBUTE_TASK, cluster, duration)
         self.attr_id    = attr_id
         self.attr_type  = attr_type
 
-class WriteAttr(Task):
-    def __init__(self, cluster, attr_id, attr_type, duration):
-        super().__init__(cluster, 2, duration)
-        self.attr_id    = attr_id
-        self.attr_type  = attr_type
+        def task_to_string(self):
+            super().task_to_string()
+            ret_str =   '{\"task_kind\": \"'+ self.task_kind\
+                +   '", \"attr_id\": \"'    + self.attr_id\
+                +   '", \"attr_type\": \"'  + self.attr_type\
+                +   '", \"duration\": \"'   + self.duration\
+                +   '}'
+            return ret_str

@@ -106,10 +106,10 @@ class TaskRoutine:
 def get_attr_element(cluster, command):
     attr_id = 0
     attr_type = 0
-    if cluster == 6:
+    if cluster == 0x0006:
         attr_id = ON_OFF_ONOFF_ATTR
         attr_type = TYPES.BOOL
-    elif cluster == 8:
+    elif cluster == 0x0008:
         attr_id = LVL_CTRL_CURR_LVL_ATTR
         attr_type = TYPES.UINT8
     elif cluster == 0x0300:
@@ -121,6 +121,7 @@ def get_attr_element(cluster, command):
 mylogger = logging.getLogger("ZB")
 mylogger.setLevel(logging.INFO)
 
+# TODO: need to remake logger for attribute tasks
 class ZigbeeLogger:
     def log_init(self):
         timestring = time.strftime("%Y.%m.%d.%H.%M.%S.", time.gmtime())

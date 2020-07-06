@@ -22,7 +22,7 @@ def duration_control(payload):
 
 class Cmd(Task):
     def __init__(self, cluster, command, payloads, duration):
-        super().__init__(cluster, COMMAND_TASK, duration)
+        super().__init__(COMMAND_TASK, cluster, duration)
         self.command    = command
         self.payloads   = payloads
     # additional method for payload generation needed
@@ -100,24 +100,44 @@ class Cmd(Task):
                 randval4 = random.randint(0x0000, 0xfeff)
                 payloads = [(randval1, TYPES.MAP8), (randval2, TYPES.UINT16), (randval3, TYPES.UINT16), (randval4, TYPES.UINT16)]
             
-            elif command == CLOLR_CTRL_STEP_COLOR_TEMP_CMD:
+            elif command == COLOR_CTRL_STEP_COLOR_TEMP_CMD:
                 payloads = None
         
         return Cmd(cluster, command, payloads, duration)
 
-    def get_changed_attr_list(self):
+    def get_dependent_attr_list(self):
         attr_list = []
         if self.cluster == ON_OFF_CLUSTER:
-            pass
+            attr_list.append(ON_OFF_ONOFF_ATTR)
         elif self.cluster == LVL_CTRL_CLUSTER:
-            pass
+            if self.command == LVL_CTRL_STOP_CMD or self.command == LVL_CTRL_STOP_ONOFF_CMD:
+                attr_list.append(LVL_CTRL_REMAIN_TIME_ATTR)
+            else:
+                attr_list.append(LVL_CTRL_CURR_LVL_ATTR)
         elif self.cluster == COLOR_CTRL_CLUSTER:
-            pass
+            if self.command == COLOR_CTRL_MV_TO_COLOR_CMD\
+                    or self.command == COLOR_CTRL_MOVE_COLOR_CMD\
+                    or self.commnad == COLOR_CTRL_STEP_COLOR_CMD:
+                attr_list.append(COLOR_CTRL_COLOR_MODE_ATTR)
+                attr_list.append(COLOR_CTRL_CURR_X_ATTR)
+                attr_list.append(COLOR_CTRL_CURR_Y_ATTR)
+            elif self.commnad == COLOR_CTRL_MV_TO_COLOR_TEMP_CMD:
+                attr_list.append(COLOR_CTRL_COLOR_MODE_ATTR)
+                attr_list.append(COLOR_CTRL_COLOR_TEMP_MIRED_ATTR)
+            elif self.command == COLOR_CTRL_STOP_MOVE_STEP_CMD:
+                attr_list.append(COLOR_CTRL_REMAINING_TIME_ATTR)
+            elif self.command == COLOR_CTRL_STEP_COLOR_TEMP_CMD:
+                attr_list.append(COLOR_CTRL_COLOR_MODE_ATTR)
+                attr_list.append(COLOR_CTRL_ENHANCED_COLOR_MODE_ATTR)
+                attr_list.append(COLOR_CTRL_COLOR_TEMP_MIRED_ATTR)
+                attr_list.append(COLOR_CTRL_COLOR_TEMP_MIN_MIRED_ATTR)
+                attr_list.append(COLOR_CTRL_COLOR_TEMP_MAX_MIRED_ATTR)
         return attr_list
     
     def task_to_string(self):
         super().task_to_string()
         ret_str =   '{\"task_kind\": \"'+ str(self.task_kind)\
+            +   '", \"cluster\": \"'    + str(self.cluster)\
             +   '", \"command\": \"'    + str(self.command)\
             +   '", \"payloads\": \"'   + str(self.payloads)\
             +   '", \"duration\": \"'   + str(self.duration)\
@@ -128,7 +148,7 @@ class ReadAttr(Task):
     def __init__(self, cluster, attr_id, duration):
         super().__init__(READ_ATTRIBUTE_TASK, cluster, duration)
         self.attr_id = attr_id
-        # automated procedure to get 
+        
         attr_type = 0
         if cluster == SCENE_CLUSTER:
             if attr_id == SCENE_SCENE_COUNT_ATTR:
@@ -183,10 +203,10 @@ class ReadAttr(Task):
 
     def task_to_string(self):
         super().task_to_string()
-        ret_str =   '{\"task_kind\": \"'+ self.task_kind\
-            +   '", \"attr_id\": \"'    + self.attr_id\
-            +   '", \"attr_type\": \"'  + self.attr_type\
-            +   '", \"duration\": \"'   + self.duration\
+        ret_str =   '{\"task_kind\": \"'+ str(self.task_kind)\
+            +   '", \"attr_id\": \"'    + str(self.attr_id)\
+            +   '", \"attr_type\": \"'  + str(self.attr_type)\
+            +   '", \"duration\": \"'   + str(self.duration)\
             +   '}'
         return ret_str
 

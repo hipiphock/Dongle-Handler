@@ -130,7 +130,7 @@ COLOR_CTRL_STEP_COLOR_CMD         = 0X09    # added by @hipiphock
 COLOR_CTRL_MV_TO_COLOR_TEMP_CMD   = 0X0a    # added by @hipiphock
 COLOR_CTRL_STOP_MOVE_STEP_CMD     = 0X47    # added by @hipiphock
 COLOR_CTRL_MV_COLOR_TEMP_CMD      = 0X4B    # added by @hipiphock
-CLOLR_CTRL_STEP_COLOR_TEMP_CMD    = 0X4C    # added by @hipiphock
+COLOR_CTRL_STEP_COLOR_TEMP_CMD    = 0X4C    # added by @hipiphock
 
 OTA_QUERY_NEXT_IMAGE_RESPONSE_CMD = 0x02
 CONFIGURE_REPORTING_CMD           = 0x06

@@ -38,6 +38,12 @@ The device's **address** and **endpoint** are for ZigBee commissioning.
 ## Task
 Each task represents ZigBee/BLE task to send to target device.
 
+### Zigbee Tasks
+
+
+### BLE Tasks
+The BLE
+
 
 ## Making task routine
 This is **the core** of this project. The Task Routine sends commands to the target device specified by **Device**, and receives the message from the target device. Then, it confirms whether the transmission was successfun and the device was OK or not.
@@ -66,16 +72,16 @@ This is the example for a single ZigBee task.
 And finally, this is the example for one task routine.
 ``` json
 {
-    "device"    :   "DongleHandler\\..\\resource\\device\\Ultra Thin Wafer.json",
+    "device"    :   ".\\resource\\device\\Ultra Thin Wafer.json",
     "connection":   0,
     "task_list" :   [
-        "DongleHandler\\..\\resource\\command\\Zigbee\\off.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\on.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\level_100.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\level_50.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\level_10.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\color_dl.json",
-        "DongleHandler\\..\\resource\\command\\Zigbee\\color_sw.json"
+        ".\\resource\\command\\Zigbee\\off.json",
+        ".\\resource\\command\\Zigbee\\on.json",
+        ".\\resource\\command\\Zigbee\\level_100.json",
+        ".\\resource\\command\\Zigbee\\level_50.json",
+        ".\\resource\\command\\Zigbee\\level_10.json",
+        ".\\resource\\command\\Zigbee\\color_dl.json",
+        ".\\resource\\command\\Zigbee\\color_sw.json"
     ],
     "iteration" :   3
 }
@@ -93,6 +99,7 @@ After installing the wrapper to your dongle,
 
 ``` shell
 pip3 install zb-cli-wrapper
+pip3 install blatann
 ```
 
 # Hardware Requirements

@@ -29,6 +29,19 @@ class Cmd(Task):
     # additional method for payload generation needed
 
     @classmethod
+    def generate_random_random_cmd(cls, cluster, duration):
+        random_command = 0x00
+        if cluster == ON_OFF_CLUSTER:
+            random_command = random.randint(0x00,0x02)
+        elif cluster == LVL_CTRL_CLUSTER:
+            random_command = random.randint(0x00,0x07)
+        elif cluster == COLOR_CTRL_CLUSTER:
+            command_id_list = [0x00, 0x03, 0x06, 0X07, 0X08, 0X09, 0X0a, 0X47, 0X4B, 0X4C]
+            random_index = random.randint(0, len(command_id_list)-1)
+            random_command = command_id_list[random_index]
+        return cls.generate_random_cmd(cluster, random_command, duration)
+
+    @classmethod
     def generate_random_cmd(cls, cluster, command, duration):
         payloads = None
         if cluster == SCENE_CLUSTER:
@@ -120,7 +133,7 @@ class Cmd(Task):
                     (color_temp_max_mired, TYPES.UINT16)]
                 duration = max(0.51, 0.1*trans_time + 0.01)
         
-        return Cmd(cluster, command, payloads, duration)
+        return cls(cluster, command, payloads, duration)
 
     def get_dependent_attr_list(self):
         attr_list = []

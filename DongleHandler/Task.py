@@ -1,5 +1,8 @@
 # Task is an element for each task routine
-# TODO: add readattr command
+# TODO:
+# 1. add readattr command
+# 2. change range value in accordance with test result from @hipiphock
+# 3. need to add BLE tasks
 import random
 import json
 from DongleHandler.Constants import *
@@ -26,7 +29,6 @@ class Cmd(Task):
         super().__init__(COMMAND_TASK, cluster, duration)
         self.command    = command
         self.payloads   = payloads
-    # additional method for payload generation needed
 
     @classmethod
     def generate_random_random_cmd(cls, cluster, duration):

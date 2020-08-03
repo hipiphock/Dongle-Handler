@@ -5,16 +5,18 @@ import json
 import logging
 
 from DongleHandler import *
+# Zigbee
 from zb_cli_wrapper.zb_cli_dev import ZbCliDevice
 from zb_cli_wrapper.src.utils.zigbee_classes.clusters.attribute import Attribute
-
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# BLE
+from blatann import BleDevice
 
 
 # added for clear path
 # TODO: need to clean path problem
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Work Routine for
 class TaskRoutine:
@@ -29,82 +31,84 @@ class TaskRoutine:
     # 2. Sending/Receiving with the dongle and the device.
     # 3. Disbanding the device from Zigbee 
     def start_routine(self):
-        
-        # Before connecting the device with the dongle,
-        # the dongle must join the hub's network.
-        # TODO: implement automated port selector
-        with open('resource\\dongle_status.json', "r") as dongle_file:
-            dongle_config = json.load(dongle_file)
-            port = dongle_config['port']
-            status = dongle_config['status']
-            dongle_file.close()
-        time.sleep(3)
-        cli_instance = ZbCliDevice('', '', port)
-        if status == 0:
-            cli_instance.bdb.channel = [24]
-            cli_instance.bdb.role = 'zr'
-            cli_instance.bdb.start()
-            # TODO: change the directory's path
-            with open('resource\\dongle_status.json', "w") as dongle_file:
-                dongle_config['status'] = 1
-                json.dump(dongle_config, dongle_file)
+        if self.connection_type == ZIGBEE_CONNECTION:
+            # Before connecting the device with the dongle,
+            # the dongle must join the hub's network.
+            # TODO: implement automated port selector
+            with open('resource\\dongle_status.json', "r") as dongle_file:
+                dongle_config = json.load(dongle_file)
+                port = dongle_config['port']
+                status = dongle_config['status']
                 dongle_file.close()
-            print("The dongle has started commissioning.")
-            print("Please search for the dongle via SmartThings App within 5 seconds.")
-            time.sleep(5.0)
+            time.sleep(3)
+            cli_instance = ZbCliDevice('', '', port)
+            if status == 0:
+                cli_instance.bdb.channel = [24]
+                cli_instance.bdb.role = 'zr'
+                cli_instance.bdb.start()
+                # TODO: change the directory's path
+                with open('resource\\dongle_status.json', "w") as dongle_file:
+                    dongle_config['status'] = 1
+                    json.dump(dongle_config, dongle_file)
+                    dongle_file.close()
+                print("The dongle has started commissioning.")
+                print("Please search for the dongle via SmartThings App within 5 seconds.")
+                time.sleep(5.0)
 
-        zblogger = ZigbeeLogger()
-        zblogger.log_init()
+            zblogger = ZigbeeLogger()
+            zblogger.log_init()
 
-        # 1. Start connection with the device.
-        # The connection of the device is ruled by SmartThings hub.
+            # 1. Start connection with the device.
+            # The connection of the device is ruled by SmartThings hub.
 
-        # do the task_list
-        for i in range(self.iteration):
-            for task in self.task_list:
-                if task.task_kind == COMMAND_TASK:
-                    if task.payloads == None:
-                        cli_instance.zcl.generic(
-                            eui64=self.device.addr,
-                            ep=self.device.ep,
-                            profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                            cluster=task.cluster,
-                            cmd_id=task.command)
-                    else:
-                        cli_instance.zcl.generic(
-                            eui64=self.device.addr,
-                            ep=self.device.ep,
-                            profile=DEFAULT_ZIGBEE_PROFILE_ID,
-                            cluster=task.cluster,
-                            cmd_id=task.command,
-                            payload=task.payloads)
-                    time.sleep(task.duration)
-                    attr_id, attr_type = get_attr_element(task.cluster, task.command)
-                    param_attr = Attribute(task.cluster, attr_id, attr_type)
-                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                    zblogger.get_command_log(task)
-                elif task.task_kind == READ_ATTRIBUTE_TASK:
-                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
-                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                    zblogger.get_read_attr_log(task, returned_attr.value)
-                elif task.task_kind == WRITE_ATTRIBUTE_TASK:
-                    param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
-                    cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                    returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
-                    zblogger.get_read_attr_log(task, returned_attr.value)
-                
+            # do the task_list
+            for i in range(self.iteration):
+                for task in self.task_list:
+                    if task.task_kind == COMMAND_TASK:
+                        if task.payloads == None:
+                            cli_instance.zcl.generic(
+                                eui64=self.device.addr,
+                                ep=self.device.ep,
+                                profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                                cluster=task.cluster,
+                                cmd_id=task.command)
+                        else:
+                            cli_instance.zcl.generic(
+                                eui64=self.device.addr,
+                                ep=self.device.ep,
+                                profile=DEFAULT_ZIGBEE_PROFILE_ID,
+                                cluster=task.cluster,
+                                cmd_id=task.command,
+                                payload=task.payloads)
+                        time.sleep(task.duration)
+                        attr_id, attr_type = get_attr_element(task.cluster, task.command)
+                        param_attr = Attribute(task.cluster, attr_id, attr_type)
+                        returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                        zblogger.get_command_log(task)
+                    elif task.task_kind == READ_ATTRIBUTE_TASK:
+                        param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
+                        returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                        zblogger.get_read_attr_log(task, returned_attr.value)
+                    elif task.task_kind == WRITE_ATTRIBUTE_TASK:
+                        param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
+                        cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                        returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
+                        zblogger.get_read_attr_log(task, returned_attr.value)
+                    
 
-        # # each task routine ends with disconnection
-        zblogger.close_logfile()
-        cli_instance.close_cli()
-        # port = serial.Serial("COM13", 115200)
-        # port.close()
-        # port.open()
-        # port.write(str.encode('reset'))
-        # port.reset_input_buffer()
-        # port.reset_output_buffer()
-        # port.close()
-        # # Problem:
+            # # each task routine ends with disconnection
+            zblogger.close_logfile()
+            cli_instance.close_cli()
+        
+        # Case: BLE connection
+        elif self.connection_type == BLE_CONNECTION:
+            # first, create a BLE object
+            port = "COM3" # for example, TODO: create port selector
+            ble_device = BleDevice(port)
+            ble_device.open()
+
+            
+
 
 def get_attr_element(cluster, command):
     attr_id = 0

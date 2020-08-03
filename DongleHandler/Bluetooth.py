@@ -4,4 +4,10 @@
 # 2. The dongle should establish connection with IoT device.
 # 3. The dongle should send/receive services & characteristics.
 
-import blatann
+from blatann import BleDevice
+import threading
+
+def detector(port):
+    ble_device = BleDevice(port)
+    ble_device.open()
+    

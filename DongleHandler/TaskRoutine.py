@@ -81,6 +81,9 @@ class TaskRoutine:
                                 cmd_id=task.command,
                                 payload=task.payloads)
                         time.sleep(task.duration)
+                        # TODO: change code like
+                        # 1. create READ_ATTR task with respect to Cmd task
+                        # 2. append READ_ATTR task to task_list
                         attr_id, attr_type = get_attr_element(task.cluster, task.command)
                         param_attr = Attribute(task.cluster, attr_id, attr_type)
                         returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
@@ -107,7 +110,7 @@ class TaskRoutine:
             ble_device = BleDevice(port)
             ble_device.open()
 
-            
+
 
 
 def get_attr_element(cluster, command):

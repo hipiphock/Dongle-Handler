@@ -92,11 +92,13 @@ class TaskRoutine:
                         param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
                         returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                         zblogger.get_read_attr_log(task, returned_attr.value)
+                        time.sleep(task.duration)
                     elif task.task_kind == WRITE_ATTRIBUTE_TASK:
                         param_attr = Attribute(task.cluster, task.attr_id, task.attr_type)
                         cli_instance.zcl.writeattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                         returned_attr = cli_instance.zcl.readattr(self.device.addr, param_attr, ep=ULTRA_THIN_WAFER_ENDPOINT)
                         zblogger.get_read_attr_log(task, returned_attr.value)
+                        time.sleep(task.duration)
                     
 
             # # each task routine ends with disconnection

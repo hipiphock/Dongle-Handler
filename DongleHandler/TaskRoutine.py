@@ -26,10 +26,6 @@ class TaskRoutine:
         self.task_list = task_list
         self.iteration = iteration
     
-    # start_routine() consists of three steps:
-    # 1. Starting connection with the device(the device joins the network).
-    # 2. Sending/Receiving with the dongle and the device.
-    # 3. Disbanding the device from Zigbee 
     def start_routine(self):
         if self.connection_type == ZIGBEE_CONNECTION:
             # Before connecting the device with the dongle,
@@ -104,14 +100,42 @@ class TaskRoutine:
             # # each task routine ends with disconnection
             zblogger.close_logfile()
             cli_instance.close_cli()
-        
-        # Case: BLE connection
+
+
+        ################# BLE Tasks ###################
+        # Four steps for BLE
+        # 1. Device scan
+        #    Device scan is done by BleDevice. It searches for BLE device and gets GATT
+        # 2. Connect to device
+        #    It is mainly done by Peer.
+        # 3. Read services and characteristics
+        #    Again, it is done by BleDevice
+        # 4. Read and write characteristics
+        #    
+
         elif self.connection_type == BLE_CONNECTION:
-            # first, create a BLE object
+            # first, create a BLE object and scan itt
             port = "COM3" # for example, TODO: create port selector
             ble_device = BleDevice(port)
             ble_device.open()
 
+        target_addr = Task.find_target_device(ble_device, "Ultra Thin Wafer")
+        peer = ble_device.connect(target_addr).wait()
+        if not peer:
+            # timeout
+            return
+        
+        # passing key?
+
+        # discover services
+        _, event_args = peer.discover_services().wait(10, exception_on_timeout=False)
+
+        # after the discovery, set the connection to permit loger connection interval
+        peer.set_connection_parameters(100, 120, 6000)
+
+
+
+        
 
 
 
@@ -141,7 +165,6 @@ class ZigbeeLogger:
         file_handler = logging.FileHandler(log_name)
         mylogger.addHandler(file_handler)
         mylogger.info("PROGRAM START")
-        # mylogger.info("Time\t\tCLuster\t\tCommand\t\tpayload\t\tinterval\t\treturn value")
 
     def get_command_log(self, task):
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]

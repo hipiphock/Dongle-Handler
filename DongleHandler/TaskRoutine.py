@@ -117,6 +117,7 @@ class TaskRoutine:
             # first, create a BLE object and scan itt
             port = "COM4" # for example, TODO: create port selector
             ble_device = BleDevice(port)
+            ble_device.configure()
             ble_device.open()
 
             target_addr = Task.find_target_device(ble_device, "Ultra Thin Wafer")

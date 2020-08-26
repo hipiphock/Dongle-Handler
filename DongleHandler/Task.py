@@ -5,6 +5,7 @@
 # 3. need to add BLE tasks
 import random
 import json
+import logging
 from DongleHandler.Constants import *
 
 # There are two types of tasks:
@@ -277,7 +278,9 @@ def find_target_device(ble_device, name):
     # Start scanning for the peripheral.
     # Using the `scan_reports` iterable on the waitable will return the scan reports as they're
     # discovered in real-time instead of waiting for the full scan to complete
+    ble_device.scanner.set_default_scan_params(timeout_seconds=10)
     for report in ble_device.scanner.start_scan().scan_reports:
+        logging.info("BLE:find_target_device: {}".format(report))
         if report.advertise_data.local_name == name:
             return report.peer_address
 

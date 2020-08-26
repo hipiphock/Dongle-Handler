@@ -73,10 +73,6 @@ def parse_task_list(file_name):
                 attr_id = parsed_task['attr_id']
                 write_attr_task = WriteAttr(cluster, attr_id, duration)
                 task_list.append(write_attr_task)
-            # else:
-            #     payloads   = [(_payloads[0][0], int(_payloads[0][1], 16)), (_payloads[1][0], int(_payloads[1][1], 16))]
-            #     if payloads[1][0] != 0:
-            #         duration = payloads[1][0]*0.1
     return task_list
 
 

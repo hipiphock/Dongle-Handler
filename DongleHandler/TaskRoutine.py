@@ -115,28 +115,73 @@ class TaskRoutine:
 
         elif self.connection_type == BLE_CONNECTION:
             # first, create a BLE object and scan itt
-            port = "COM3" # for example, TODO: create port selector
+            port = "COM4" # for example, TODO: create port selector
             ble_device = BleDevice(port)
             ble_device.open()
 
-        target_addr = Task.find_target_device(ble_device, "Ultra Thin Wafer")
-        peer = ble_device.connect(target_addr).wait()
-        if not peer:
-            # timeout
-            return
-        
-        # passing key?
+            target_addr = Task.find_target_device(ble_device, "Ultra Thin Wafer")
+            if not target_addr:
+                logging.info("Did not find targt peripheral")
+                return
+            logging.info("finding target device complete.")
+            peer = ble_device.connect(target_addr).wait()
+            if not peer:
+                # timeout
+                logging.info("Could not connect to peer.")
+                return
+            
+            # passing key?
+            peer.security.set_security_params(passcode_pairing=True,
+                                              io_capabilities=smp.IoCapabilities.KEYBOARD_DISPLAY,
+                                              bond=False, out_of_band=False)
+            peer.security.on_passkey_required.registeR(on_passkey_entry)
+            peer.security.on_peripheral_security_request.register(on_peripheral_security_request)
 
-        # discover services
-        _, event_args = peer.discover_services().wait(10, exception_on_timeout=False)
+            # discover services
+            # Wait up to 10 seconds for service discovery to complete
+            _, event_args = peer.discover_services().wait(10, exception_on_timeout=False)
+            logging.info("Service discovery complete! status: {}".format(event_args.status))
 
-        # after the discovery, set the connection to permit loger connection interval
-        peer.set_connection_parameters(100, 120, 6000)
+            # after the discovery, set the connection to permit loger connection interval
+            peer.set_connection_parameters(100, 120, 6000)
 
+            # Wait up to 60 seconds for the pairing process, if the link is not secured yet
+            if peer.security.security_level == smp.SecurityLevel.OPEN:
+                peer.security.pair().wait(60)
 
+            # Find the counting characteristic
+            counting_char = peer.database.find_characteristic(constants.COUNTING_CHAR_UUID)
+            if counting_char:
+                logger.info("Subscribing to the counting characteristic")
+                counting_char.subscribe(on_counting_char_notification).wait(5)
+            else:
+                logger.warning("Failed to find counting characteristic")
+            
+            # Find the hex conversion characteristic. This characteristic takes in a bytestream and converts it to its
+            # hex representation. e.g. '0123' -> '30313233'
+            hex_convert_char = peer.database.find_characteristic(constants.HEX_CONVERT_CHAR_UUID)
+            if hex_convert_char:
+                # Generate some data ABCDEFG... Then, incrementally send increasing lengths of strings.
+                # i.e. first send 'A', then 'AB', then 'ABC'...
+                data_to_convert = bytes(ord('A') + i for i in range(12))
+                for i in range(len(data_to_convert)):
+                    data_to_send = data_to_convert[:i+1]
+                    logger.info("Converting to hex data: '{}'".format(data_to_send))
 
-        
+                    # Write the data, waiting up to 5 seconds for the write to complete
+                    if not hex_convert_char.write(data_to_send).wait(5, False):
+                        logger.error("Failed to write data, i={}".format(i))
+                        break
 
+                    # Write was successful, when we read the characteristic the peripheral should have converted the string
+                    # Once again, initiate a read and wait up to 5 seconds for the read to complete
+                    char, event_args = hex_convert_char.read().wait(5, False)
+                    logger.info("Hex: '{}'".format(event_args.value.decode("ascii")))
+            else:
+                logger.warning("Failed to find hex convert char")
+
+            # After reading services and characteristics,
+            # I don't know what to do
 
 
 def get_attr_element(cluster, command):

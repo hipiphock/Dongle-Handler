@@ -58,7 +58,7 @@ class BLEhandler(BLEDriverObserver, BLEAdapterObserver):
 
 
 if __name__ == "__main__":
-    serial_port = "COM4"
+    serial_port = "COM7"
     driver = BLEDriver(
         serial_port=serial_port,
         auto_flash=False,

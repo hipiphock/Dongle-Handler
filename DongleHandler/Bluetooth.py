@@ -9,6 +9,8 @@ import time
 import logging
 from queue import Queue, Empty
 
+from pc_ble_driver_py import config
+config.__conn_ic_id__ = "NRF52"
 from pc_ble_driver_py.observers import *
 from pc_ble_driver_py.ble_driver import(
     BLEDriver,
@@ -63,12 +65,14 @@ if __name__ == "__main__":
         baud_rate=1000000,
         log_severity_level="info"
     )
-
     adapter = BLEAdapter(driver)
     ble_handler = BLEhandler(adapter)
+    print("dosmas3")
 
     ble_handler.open()
+    print("dosmas4")
     conn = ble_handler.connect_and_discover()
+    print("dosmas5")
 
     if conn is not None:
         time.sleep(10)

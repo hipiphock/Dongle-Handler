@@ -52,13 +52,14 @@ class BLEhandler(BLEDriverObserver, BLEAdapterObserver):
 
     def connect_and_discover(self):
         scan_duration = 10
-        params = BLEGapScanParams(interval_ms=200, window_ms=150, timeout_s=scan_duration)
+        params = BLEGapScanParams(interval_ms=250, window_ms=150, timeout_s=scan_duration)
         self.adapter.driver.ble_gap_scan_start(scan_params=params)
         try:
             new_conn = self.conn_q.get(timeout=scan_duration)
+            print(new_conn)
             self.adapter.service_discovery(new_conn)
             self.adapter.enable_notification(
-                new_conn, BLEUUID(BLEUUID.Standard.battery_level)
+                new_conn, BLEUUID(BLEUUID.Standard.unknown)
             )
             return new_conn
         except Empty:

@@ -115,7 +115,7 @@ class TaskRoutine:
         #    
 
         elif self.connection_type == BLE_CONNECTION:
-            
+            pass
 
 
 

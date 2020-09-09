@@ -53,9 +53,7 @@ class BLEhandler(BLEDriverObserver, BLEAdapterObserver):
     def connect_and_discover(self):
         scan_duration = 10
         params = BLEGapScanParams(interval_ms=200, window_ms=150, timeout_s=scan_duration)
-
         self.adapter.driver.ble_gap_scan_start(scan_params=params)
-
         try:
             new_conn = self.conn_q.get(timeout=scan_duration)
             self.adapter.service_discovery(new_conn)
@@ -69,7 +67,8 @@ class BLEhandler(BLEDriverObserver, BLEAdapterObserver):
 
 
 if __name__ == "__main__":
-    serial_port = "COM7"
+    logging.basicConfig(level=logging.DEBUG)
+    serial_port = "COM4"
     driver = BLEDriver(
         serial_port=serial_port,
         auto_flash=False,

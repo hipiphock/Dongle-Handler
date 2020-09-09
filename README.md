@@ -99,6 +99,7 @@ After installing the wrapper to your dongle,
 
 ``` shell
 pip3 install zb-cli-wrapper
+pip3 install pc-ble-driver-py
 pip3 install blatann
 ```
 
